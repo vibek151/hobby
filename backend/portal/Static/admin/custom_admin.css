@@ -1,0 +1,8 @@
+.inline-group .form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.form-row .fieldBox {
+    width: 200px;
+}

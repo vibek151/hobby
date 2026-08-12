@@ -1,0 +1,163 @@
+
+.profile-card{
+    display:flex;
+    justify-content:space-between;
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 3px 15px rgba(0,0,0,.1);
+}
+
+.profile-left{
+    flex:1;
+}
+
+.profile-right{
+    width:220px;
+    text-align:center;
+    border-left:1px solid #e5e7eb;
+    padding-left:30px;
+}
+
+.student-photo{
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    border-radius:50%;
+    border:5px solid #2563eb;
+}
+
+.student-photo:hover{
+    transform:scale(1.03);
+    transition:.3s;
+}
+
+.detail-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 0;
+    border-bottom:1px solid #f1f5f9;
+}
+
+.detail-row span:first-child{
+    color:#64748b;
+    font-weight:500;
+}
+
+.detail-row span:last-child{
+    color:#111827;
+    font-weight:600;
+}
+
+.status-active{
+    display:inline-block;
+    margin-top:30px;
+    background:#22c55e;
+    color:white;
+    padding:8px 20px;
+    border-radius:25px;
+    font-weight:600;
+}
+
+.status-inactive{
+    display:inline-block;
+    margin-top:30px;
+    background:#6b7280;
+    color:white;
+    padding:8px 20px;
+    border-radius:25px;
+    font-weight:600;
+}
+
+.status-suspended{
+    display:inline-block;
+    margin-top:30px;
+    background:#ef4444;
+    color:white;
+    padding:8px 20px;
+    border-radius:25px;
+    font-weight:600;
+}
+
+
+/* Remaining cards */
+
+.info-section{
+    background:white;
+    padding:30px;
+    margin-top:25px;
+    border-radius:20px;
+    box-shadow:0 3px 15px rgba(0,0,0,.1);
+}
+
+.info-section h2{
+    margin-bottom:25px;
+    font-size:28px;
+    color:#111827;
+}
+
+.info-section .detail-row:last-child{
+    border-bottom:none;
+}
+
+
+/* Responsive */
+
+@media(max-width:900px){
+
+    .profile-card{
+        flex-direction:column-reverse;
+    }
+
+    .profile-right{
+        width:100%;
+        border-left:none;
+        border-bottom:1px solid #e5e7eb;
+        margin-bottom:30px;
+        padding-left:0;
+        padding-bottom:25px;
+    }
+
+    .detail-row{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:8px;
+    }
+
+}
+
+
+@media(max-width:600px){
+
+    .profile-card,
+    .info-section{
+        padding:20px;
+    }
+
+    .student-photo{
+        width:120px;
+        height:120px;
+    }
+
+    .info-section h2{
+        font-size:24px;
+    }
+
+}
+
+.pdf-button{
+    display:inline-block;
+    margin-top:15px;
+    background:#2563eb;
+    color:white;
+    padding:10px 20px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    transition:.3s;
+}
+
+.pdf-button:hover{
+    background:#1d4ed8;
+}

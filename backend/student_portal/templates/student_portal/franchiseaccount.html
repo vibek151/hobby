@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Franchise Account</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+        }
+        .card {
+            width: 400px;
+            margin: 80px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+        button {
+            padding: 10px;
+            margin: 5px 2px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .blue { background: #2d6cdf; color: white; }
+        .green { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h3>Change Email</h3>
+
+    <!-- Current Email -->
+    <label>Current Email:</label>
+    <input type="email" value="{{ request.user.email }}" readonly>
+
+    <!-- New Email -->
+    <label>Enter New Email:</label>
+    <input type="email" id="new_email" placeholder="Enter new email">
+
+    <!-- Buttons -->
+    <button class="blue">Verify Old Email</button>
+    <button class="blue">Send OTP to New Email</button>
+
+    <!-- OTP Inputs -->
+    <input type="text" id="old_otp" placeholder="Old Email OTP">
+    <input type="text" id="new_otp" placeholder="New Email OTP">
+
+    <!-- FINAL BUTTON -->
+    <button id="verifyBtn" class="green" type="button">
+        Verify & Update Email
+    </button>
+</div>
+
+<script>
+document.getElementById("verifyBtn").addEventListener("click", function () {
+
+    const newEmail = document.getElementById("new_email").value;
+    const oldOtp = document.getElementById("old_otp").value;
+    const newOtp = document.getElementById("new_otp").value;
+
+    if (!newEmail) {
+        alert("Please enter new email");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("new_email", newEmail);
+    formData.append("old_otp", oldOtp);
+    formData.append("new_otp", newOtp);
+
+    fetch("/update-email/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+
+        if (data.status === "success") {
+            alert("Email updated successfully!");
+            location.reload();
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Something went wrong!");
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,255 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+{% block content %}
+<h1 style="color:red">CUSTOM HISTORY WORKING</h1>
+<style>
+    #history { 
+        width: 100%; 
+        border-collapse: collapse; 
+        background: #fff; 
+        margin-top: 20px; 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    }
+
+    .history-row { 
+        cursor: pointer; 
+        border-bottom: 1px solid #eee; 
+        transition: 0.2s; 
+    }
+
+    .history-row:hover { 
+        background: #f1f1f1 !important; 
+    }
+
+    thead th {
+        text-align: left; 
+        background: #f8f9fa; 
+        color: #666; 
+        font-size: 11px;
+        text-transform: uppercase;
+        padding: 15px;
+        letter-spacing: 0.5px;
+    }
+
+    #history-panel {
+        position: fixed; 
+        right: -450px; 
+        top: 0; 
+        width: 400px; 
+        height: 100%;
+        background: #ffffff; 
+        border-left: 1px solid #ddd; 
+        padding: 25px;
+        transition: right 0.3s ease; 
+        z-index: 9999;
+        box-shadow: -10px 0 20px rgba(0,0,0,0.1); 
+        overflow-y: auto;
+    }
+
+    #history-panel.active { right: 0; }
+
+    .change-item { 
+        margin-bottom: 12px; 
+        padding: 12px; 
+        background: #f8f9fa; 
+        border-radius: 6px; 
+        border-left: 4px solid #007bff; 
+    }
+
+    .field-label { 
+        font-weight: bold; 
+        font-size: 11px; 
+        color: #666; 
+        text-transform: uppercase; 
+        display: block; 
+        margin-bottom: 4px; 
+    }
+
+    .diff-text { 
+        font-family: 'Courier New', monospace; 
+        font-size: 13px; 
+    }
+
+    .old-val { 
+        color: #d9534f; 
+        text-decoration: line-through; 
+    }
+
+    .new-val { 
+        color: #28a745; 
+        font-weight: bold; 
+    }
+
+    .overlay { 
+        display: none; 
+        position: fixed; 
+        top: 0; left: 0; 
+        width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.1); 
+        z-index: 9998; 
+    }
+
+    .overlay.active { display: block; }
+</style>
+
+<div id="panel-overlay" class="overlay" onclick="closePanel()"></div>
+
+<h2>History: {{ object }}</h2>
+
+<table id="history">
+    <thead>
+        <tr class="history-row" data-details="{{ action.tooltip|default:'' }}">
+            <th>DATE/TIME</th>
+            <th>USER</th>
+            <th>ACTION</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for action in action_list %}
+        <tr class="history-row"
+            
+            data-details="{{ action.tooltip|default:'' }}">
+
+            <td style="padding: 15px;">
+                {% if action.history_date %}
+                    {{ action.history_date|date:"M. d, Y, g:i a" }}
+                {% elif action.action_time %}
+                    {{ action.action_time|date:"M. d, Y, g:i a" }}
+                {% else %}
+                    <span style="color:#ccc">N/A</span>
+                {% endif %}
+            </td>
+
+            <!-- 🔥 FIXED USER LOGIC -->
+            <td style="padding: 15px;">
+                {% if action.history_user %}
+                    
+                    {% if action.history_user.is_superuser %}
+                        <b style="color:#dc3545;">SUPERUSER</b>
+
+                    {% elif action.history_user == request.user %}
+                        <b style="color:#007bff;">You</b>
+
+                    {% else %}
+                        <b style="color:green;">
+                            {{ action.history_user.username }}
+                        </b>
+
+                    {% endif %}
+
+                {% elif action.user %}
+
+                    {% if action.user.is_superuser %}
+                        <b style="color:#dc3545;">SUPERUSER</b>
+
+                    {% elif action.user == request.user %}
+                        <b style="color:#007bff;">You</b>
+
+                    {% else %}
+                        <b style="color:green;">
+                            {{ action.user.username }}
+                        </b>
+
+                    {% endif %}
+
+                {% else %}
+                    <span style="color:#999;">System</span>
+                {% endif %}
+            </td>
+
+            <td style="padding: 15px;">
+                {% if action.history_type == '+' or action.action_flag == 1 %}
+                    <span style="color: #007bff; font-weight: bold;">Created</span>
+                {% else %}
+                    <span>Changed</span>
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div id="history-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0;">Modification Details</h3>
+        <span onclick="closePanel()" style="cursor:pointer; font-size:28px; color:#999;">&times;</span>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <div id="panel-content"></div>
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // FIX 1: Match the ID "history" from your screenshot
+        const rows = document.querySelectorAll("#history tbody tr");
+        const content = document.getElementById("panel-content");
+        const panel = document.getElementById("history-panel");
+        const overlay = document.getElementById("panel-overlay");
+
+        console.log("Found rows:", rows.length); // Should not be 0
+
+        rows.forEach(row => {
+            row.addEventListener("click", function () {
+                let rawData = row.getAttribute("data-details");
+                let html = "";
+
+                if (!rawData || rawData.trim() === "" || rawData === "None") {
+                    html = "<p style='color:#999;'>No data found</p>";
+                } else {
+                    // Split by newlines or escaped string newlines
+                    let lines = rawData.split(/\n|\\n/);
+                    let hasValidChange = false;
+
+                    lines.forEach(line => {
+                        line = line.trim();
+                        if (!line) return;
+
+                        // FIX 2: Use Regex to find the colon and the arrow (supports all arrow types)
+                        const match = line.match(/^(.+?):(.+?)(?:→|\u2192|&rarr;)(.+)$/);
+
+                        if (match) {
+                            const field = match[1].trim();
+                            const oldVal = match[2].trim();
+                            const newVal = match[3].trim();
+
+                            html += `
+                                <div class="change-item">
+                                    <span class="field-label">${field}</span>
+                                    <div class="diff-text">
+                                        <span class="old-val">${oldVal}</span> →
+                                        <span class="new-val">${newVal}</span>
+                                    </div>
+                                </div>`;
+                            hasValidChange = true;
+                        } else {
+                            // For "Initial record created" or "No visible change"
+                            html += `
+                                <div class="change-item">
+                                    <div class="diff-text">${line}</div>
+                                </div>`;
+                            hasValidChange = true;
+                        }
+                    });
+                    
+                    if (!hasValidChange) html = "<p style='color:#999;'>No data found</p>";
+                }
+
+                content.innerHTML = html;
+                panel.classList.add("active");
+                overlay.classList.add("active");
+            });
+        });
+    });
+
+
+    function closePanel() {
+        document.getElementById("history-panel").classList.remove("active");
+        document.getElementById("panel-overlay").classList.remove("active");
+    }
+</script>
+{% endblock %}

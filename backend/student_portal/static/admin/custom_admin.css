@@ -1,0 +1,21 @@
+/* ===== FORCE PASSPORT SIZE ===== */
+
+/* Container limit */
+.form-row.field-passport_photo{
+    max-width:200px !important;
+}
+
+/* Image preview limit */
+.form-row.field-passport_photo img{
+    width:150px !important;
+    height:180px !important;
+    object-fit:cover !important;
+    border-radius:8px;
+    border:2px solid #bbb;
+    display:block;
+}
+
+/* File input smaller */
+.form-row.field-passport_photo input[type=file]{
+    width:160px !important;
+}

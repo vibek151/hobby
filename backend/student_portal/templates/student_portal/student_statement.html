@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Statement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .student-box {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 30px;
+        }
+
+        .student-info p {
+            margin: 4px 0;
+        }
+
+        .photo img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border: 1px solid #000;
+        }
+
+        .course-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #999;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .summary {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .remaining {
+            color: red;
+        }
+
+        .paid {
+            color: green;
+        }
+
+        .download-btn {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .download-btn a {
+            padding: 8px 15px;
+            background: black;
+            color: white;
+            text-decoration: none;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Dashboard Loaded Successfully</h1>
+<div class="header">
+    <h1>SMART COMPUTER INSTITUTE</h1>
+    <h3>Payment Statement</h3>
+</div>
+
+<div class="download-btn">
+    <a href="{% url 'admin:student_portal_paymenthistory_statement' student.id %}?download=pdf">
+        Download PDF
+    </a>
+</div>
+
+<!-- STUDENT DETAILS -->
+<div class="student-box">
+    <div class="student-info">
+        <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+        <p><strong>Name:</strong> {{ student.name }}</p>
+        <p><strong>Phone:</strong> {{ student.phone }}</p>
+        <p><strong>Address:</strong> {{ student.address }}</p>
+    </div>
+
+    <div class="photo">
+        {% if student.passport_photo %}
+            <img src="{{ student.passport_photo.url }}">
+        {% endif %}
+    </div>
+</div>
+
+<!-- COURSE LOOP -->
+{% for item in course_data %}
+
+{% if forloop.first %}
+<h4 style="margin-top:15px;">Admission Payment</h4>
+
+<table>
+    <tr>
+        <th>Receipt</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Discount (%)</th>
+        <th>Final Amount</th>
+    </tr>
+
+    <tr>
+        <td>{{ student.receipt_no }}</td>
+        <td>ADMISSION</td>
+        <td>₹ {{ student.admission_amount }}</td>
+        <td>{{ student.discount_percent }}%</td>
+        <td>₹ {{ student.final_amount }}</td>
+    </tr>
+</table>
+
+<hr style="margin:20px 0;">
+{% endif %}
+<div class="course-section">
+
+    <h3>
+        Course: {{ item.course.name }}
+        {% if item.is_active %}
+            <span style="color:green;">(Current)</span>
+        {% else %}
+            <span style="color:gray;">(Upgraded)</span>
+        {% endif %}
+    </h3>
+
+    <p><strong>Admission Date:</strong> {{ item.enrollment.admission_date }}</p>
+    <p><strong>Total Course Fee:</strong> ₹ {{ item.enrollment.total_fee|default:item.course.total_fees }}</p>
+
+    <table>
+        <tr>
+            <th>Sl</th>
+            <th>Date</th>
+            <th>Receipt</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Fine</th>
+            <th>Waive Fine</th>
+            <th>Total</th>
+        </tr>
+
+        {% for payment in item.payments %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ payment.payment_date }}</td>
+            <td>{{ payment.receipt_no }}</td>
+            <td>{{ payment.fee_type }}</td>
+            <td>₹ {{ payment.amount }}</td>
+            <td>₹ {{ payment.fine }}</td>
+            <td>
+                {% if payment.waive_fine %}
+                    {% if payment.waive_fine == True %}
+                        ₹ {{ payment.fine }}
+                    {% else %}
+                        ₹ {{ payment.waive_fine }}
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                ₹ 
+                {% if payment.waive_fine %}
+                    {{ payment.amount }}
+                {% else %}
+                    {{ payment.amount|add:payment.fine }}
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8">No course payments yet</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="summary">
+        <p>Total Paid: ₹ {{ item.total_paid }}</p>
+        <p>
+            <strong>Total Fine:</strong>
+
+            {% if item.total_waived == 0 %}
+                ₹ {{ item.total_fine }}
+
+            {% elif item.total_waived == item.total_fine %}
+                ₹ {{ item.total_fine }} (Fully Waived)
+
+            {% else %}
+                ₹ {{ item.total_fine|add:"-"|add:item.total_waived }}
+                (₹ {{ item.total_waived }} Waived)
+            {% endif %}
+        </p>
+
+        {% if item.remaining > 0 %}
+            <p class="remaining">Remaining: ₹ {{ item.remaining }}</p>
+        {% else %}
+            <p class="paid">Fully Paid</p>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endfor %}
+
+<hr>
+
+<h2>Overall Summary</h2>
+<p><strong>Total Paid:</strong> ₹ {{ overall_paid }}</p>
+<p><strong>Total Fine:</strong> ₹ {{ overall_fine }}</p>
+<p><strong>Grand Total:</strong> ₹ {{ grand_total }}</p>
+
+</body>
+</html>

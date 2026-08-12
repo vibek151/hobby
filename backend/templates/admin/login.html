@@ -1,0 +1,276 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+
+<style>
+    #nav-sidebar, 
+    .toggle-nav-sidebar, 
+    .breadcrumbs,
+    #content > h1,
+    .object-tools {
+        display: none !important;
+    }
+
+    #main {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+
+    #container {
+        height: 100%;
+    }
+
+    #main {
+        margin-left: 0 !important;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* TRUE CENTERING */
+    #content {
+        position: fixed;
+        top: 60px;   /* admin header height */
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 60px);
+
+        display: flex;
+        justify-content: center;  /* horizontal */
+        align-items: center;      /* vertical */
+
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #fdfdfd;
+    }
+
+    .login-card {
+        max-width: 420px;
+        width: 90%;
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: 1px solid #eee;
+        text-align: center;
+    }
+
+    .login-card h2 {
+        margin-bottom: 25px;
+        font-weight: 600;
+        color: #333;
+        font-size: 1.5rem;
+    }
+
+    .form-group {
+        text-align: left;
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+        color: #555;
+    }
+
+    .login-card input[type="text"], 
+    .login-card input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 1rem;
+        background-color: #f9f9f9;
+    }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+    .password-wrapper input {
+        padding-right: 40px;
+    }
+
+    .toggle-eye {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 16px;
+        color: #777;
+        transition: transform 0.2s ease;
+    }
+
+    .toggle-eye.blink {
+        transform: translateY(-50%) scale(0.7);
+    }
+
+    .login-button {
+        width: 100%;
+        padding: 14px;
+        background: #5b7c99;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background 0.3s;
+    }
+
+    .login-button:hover {
+        background: #4a6680;
+    }
+
+    .forgot-link {
+        margin-top: 25px;
+    }
+
+    .forgot-link a {
+        color: #79aec8;
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
+
+    .forgot-link a:hover {
+        text-decoration: underline;
+    }
+
+    .messagelist {
+        position: fixed;
+        top: 48px;
+        right: 0px;
+        z-index: 2000;
+
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .messagelist li {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: 500;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    }
+
+    /* Error */
+    .messagelist li.error {
+        background: #dc3545;
+    }
+
+    /* Success (future use) */
+    .messagelist li.success {
+        background: #1e7e34;
+    }
+
+    .messagelist {
+        transition: opacity 0.3s ease;
+    }
+
+    input.error {
+        border: 1px solid #dc3545;
+    }
+
+    @keyframes fadeOut {
+        0% { opacity: 1; }
+        80% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+<ul class="messagelist" id="loginMessages">
+    {% if form.non_field_errors %}
+        <li class="error">Invalid username or password</li>
+    {% endif %}
+</ul>
+<div class="login-card">
+    <h2>Login</h2>
+
+    <form method="post" id="login-form">
+        {% csrf_token %}
+        
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <div class="form-group">
+            <label for="id_username">Username:</label>
+            {{ form.username }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_password">Password:</label>
+
+            <div class="password-wrapper">
+                {{ form.password }}
+                <span class="toggle-eye" onclick="togglePassword()" id="eye-icon">👁</span>
+            </div>
+        </div>
+
+        <button type="submit" class="login-button">
+            Log in
+        </button>
+    </form>
+
+    <div class="forgot-link" style="text-align:center;">
+        <p>
+            <a href="{% url 'password_reset' %}">
+                Forgot Password?
+            </a>
+        </p>
+        <p>
+            <a href="/forgot-username/">
+                Forgot Username?
+            </a>
+        </p>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const field = document.getElementById("id_password"); // ✅ Django default id
+    const eye = document.getElementById("eye-icon");
+
+    eye.classList.add("blink");
+    setTimeout(() => eye.classList.remove("blink"), 150);
+
+    if (field.type === "password") {
+        field.type = "text";
+        eye.textContent = "🙈";
+    } else {
+        field.type = "password";
+        eye.textContent = "👁";
+    }
+}
+
+
+setTimeout(() => {
+    const msg = document.getElementById("loginMessages");
+    if (msg) {
+        msg.style.opacity = "0";
+        setTimeout(() => {
+            msg.remove();
+        }, 300);
+    }
+}, 2000);
+
+
+</script>
+
+{% endblock %}

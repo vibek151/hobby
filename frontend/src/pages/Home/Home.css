@@ -1,0 +1,53 @@
+.floating-nav {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    /* Combine default transform values safely */
+    transform: translate3d(-50%, -20px, 0);
+    
+    background: white;
+    padding: 16px 35px;
+    border-radius: 50px;
+    display: flex;
+    gap: 40px;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.1);
+    z-index: 1000;
+    
+    opacity: 0;
+    pointer-events: none; /* Replaces visibility: hidden safely without clipping animation frames */
+
+    /* Premium Cubic-Bezier Timing Function for high-end UI physics */
+    transition: 
+        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+        opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Forces hardware acceleration via GPU */
+    will-change: transform, opacity;
+}
+
+.floating-nav.show {
+    transform: translate3d(-50%, 0, 0);
+    opacity: 1;
+    pointer-events: auto; /* Re-enables clicking when visible */
+}
+
+.floating-nav a {
+    color: #475569; /* Slightly softer gray for default state */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    /* padding: 8px 16px; */
+    border-radius: 30px; /* Creates the inner capsule */
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-nav a:hover {
+    color: #2563eb; /* Your primary brand blue */
+    background: #eff6ff; /* Super soft blue background fill */
+}
+
+/* If you have a class for the current page link */
+.floating-nav a.active {
+    color: #2563eb;
+    background: #eff6ff;
+}

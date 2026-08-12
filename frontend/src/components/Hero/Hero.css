@@ -1,0 +1,155 @@
+/* Core Section Layout */
+.hero {
+    min-height: 100vh;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: #f4f9ff; /* Subtle cool blue/white background from your image */
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.hero-content {
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Heading Group containing Title & Right-Aligned Subtitle */
+.hero-header-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.hero h1 {
+    font-size: 72px; /* Large, bold title size from your code */
+    font-weight: 800;
+    line-height: 1.1;
+    color: #1e293b;
+    margin: 0;
+    letter-spacing: -1px;
+}
+
+.text-gradient {
+    color: #2563eb; /* Strong solid blue match */
+}
+
+/* The floating subtitle under the main text */
+.hero-subheading {
+    display: block;
+    text-align: right;
+    font-size: 20px;
+    color: #475569;
+    font-weight: 500;
+    margin-top: 10px;
+    padding-right: 20px;
+}
+
+/* Centralized Badge */
+.hero-badge-container {
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 10px 24px;
+    background: #e2ecff;
+    color: #2563eb;
+    border: 1px solid #cbdfff;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Main Description Paragraph */
+.hero-description {
+    color: #475569;
+    font-size: 20px;
+    line-height: 1.6;
+    margin: 0 0 45px 0;
+    max-width: 750px;
+}
+
+/* Action Buttons */
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.primary-btn {
+    padding: 16px 36px;
+    border: none;
+    border-radius: 12px;
+    background: #2563eb;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+    transition: all 0.2s ease;
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.secondary-btn {
+    padding: 16px 36px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    color: #475569;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
+}
+
+.secondary-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+/* Responsiveness line break handling */
+@media (min-width: 769px) {
+    .desktop-only {
+        display: block;
+    }
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none;
+    }
+    .hero h1 {
+        font-size: 44px;
+    }
+    .hero-subheading {
+        text-align: center;
+        padding-right: 0;
+        font-size: 16px;
+    }
+    .hero-description {
+        font-size: 16px;
+    }
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+.secondary-btn{
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}

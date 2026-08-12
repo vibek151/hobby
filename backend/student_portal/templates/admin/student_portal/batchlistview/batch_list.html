@@ -1,0 +1,228 @@
+{% extends "admin/base_site.html" %}
+{% load batch_filters %}
+
+{% block content %}
+
+<div class="batch-generator">
+
+<style>
+.batch-generator table{ text-align:center; }
+.batch-generator th, .batch-generator td{ text-align:center; vertical-align:middle; }
+
+/* 1. Bold Headers with Single Background Color for PDF */
+.batch-generator table table th {
+    font-weight: bold !important;
+    color: #000 !important;
+    background-color: #e5e5e5 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+/* 2. Uniform row color */
+.batch-generator table table tr td {
+    background-color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+.batch-title{ font-weight:bold; font-size:18px; }
+.batch-time{ font-weight:bold; font-size:14px; }
+
+.print-header, .print-footer{ display:none; }
+
+@page{ margin:5mm 15mm; }
+
+@media print {
+    body{ counter-reset: page 1; }
+    .batch-generator table th, .batch-generator table td{ padding:2px 5px; line-height:1.1; font-size:12px; }
+    .print-header, .print-footer{ display:block; }
+    body{ background:white; margin:0; padding:0; font-family: Arial, sans-serif; }
+    form, button, #header, #nav-sidebar, .breadcrumbs{ display:none !important; }
+    .print-header{ text-align:center; margin-top:0; margin-bottom:8px; }
+    .print-header h1{ margin:0; font-size:26px; }
+    .print-footer{ position:fixed; bottom:5mm; left:0; width:100%; font-size:12px; display:flex; justify-content:space-between; }
+    .footer-left{ margin-left:10mm; }
+    .footer-right{ margin-right:10mm; }
+    .pageNumber:after{ content: counter(page); }
+
+
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    #content, #content-main {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* extra */
+    .batch-block {
+        display: block;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    td {
+        vertical-align: top !important;
+    }
+
+    table {
+        page-break-inside: auto !important;
+    }
+
+    .batch-block {
+        page-break-before: auto;
+    }
+
+}
+
+.batch-controls{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.left-controls{ display:flex; align-items:center; gap:10px; }
+
+.btn-generate{ 
+    background:linear-gradient(135deg,#4CAF50,#2E7D32); 
+    color:white; padding:8px 16px; border-radius:6px; border:none; font-weight:600; cursor:pointer; 
+    box-shadow:0 3px 8px rgba(0,0,0,0.15); transition:all 0.25s ease;
+}
+
+.btn-print{
+    background:linear-gradient(135deg,#1d72f3,#0047b8); 
+    color:white; padding:8px 16px; border-radius:6px; border:none; font-weight:600; cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,0.15); transition:all 0.25s ease;
+}
+
+.btn-generate:hover, .btn-print:hover { transform:translateY(-2px); box-shadow:0 6px 12px rgba(0,0,0,0.25); }
+.btn-generate:active, .btn-print:active { transform:scale(0.95); }
+
+</style>
+
+<div class="print-header">
+    <h1>SMART COMPUTER INSTITUTE</h1>
+    <h3>Batch List</h3>
+</div>
+
+<form method="get" onsubmit="return validateBatch()" class="batch-controls">
+    <div class="left-controls">
+        Students per batch:
+        <input type="number" id="batchCount" name="count" value="{{ count }}" min="1" step="1">
+        <button type="submit" class="btn-generate">Get Batch List</button>
+    </div>
+    <button type="button" onclick="printBatch()" class="btn-print">Print Batch List</button>
+</form>
+
+<table border="1" style="border-collapse:collapse;width:100%">
+    <tr>
+        {% for day in days %}
+        <th class="batch-title">{{ day.day }}</th>
+        {% endfor %}
+    </tr>
+    <tr>
+        {% for day in days %}
+        <td valign="top">
+            {% for time in times %}
+            <div class="batch-time">{{ time }}</div>
+
+            {% with students_list=students|get_item:day.id|get_item:time.id %}
+            <table border="1" data-total="{{ students_list|length }}" style="width:100%;border-collapse:collapse;margin-bottom:10px">
+                <tr style="font-weight: bold;">
+                    <th>SL NO</th>
+                    <th>Student Name</th>
+                    <th>Student Code</th>
+                </tr>
+
+                {% for student in students_list|slice:":count" %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.student_id }}</td>
+                </tr>
+                {% endfor %}
+
+                {% for i in range %}
+                    {% if i > students_list|length %}
+                    <tr>
+                        <td>{{ i }}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+            {% endwith %}
+
+            {% endfor %}
+        </td>
+        {% endfor %}
+    </tr>
+</table>
+
+<div class="print-footer">
+    <div class="footer-left">Generated on: <span id="printDate"></span></div>
+    <div class="footer-right">Page <span class="pageNumber"></span></div>
+</div>
+
+<script>
+const input = document.getElementById("batchCount");
+
+document.addEventListener("DOMContentLoaded", function() {
+    const params = new URLSearchParams(window.location.search);
+    const urlCount = params.get("count");
+    
+    // Check ACTUAL max in DB via the data-total attribute
+    let absoluteMaxInDB = 0;
+    document.querySelectorAll("table[data-total]").forEach(table => {
+        const total = parseInt(table.getAttribute("data-total") || 0);
+        if (total > absoluteMaxInDB) absoluteMaxInDB = total;
+    });
+
+    let saved = localStorage.getItem("batchCount");
+
+    // AUTO-CORRECTION: If DB > Saved, force update so students aren't hidden
+    if (saved && parseInt(saved) < absoluteMaxInDB) {
+        localStorage.setItem("batchCount", absoluteMaxInDB);
+        saved = absoluteMaxInDB;
+    }
+
+    if (saved && saved !== urlCount) {
+        window.location.search = "?count=" + (saved || absoluteMaxInDB);
+    }
+
+    const now = new Date();
+    const dateEl = document.getElementById("printDate");
+    if (dateEl) dateEl.innerText = now.toLocaleDateString() + " " + now.toLocaleTimeString();
+});
+
+function printBatch() { window.print(); }
+
+function validateBatch() {
+    const value = parseInt(input.value);
+    let maxInDB = 0;
+
+    // Use data-total to validate even if rows are currently hidden
+    document.querySelectorAll("table[data-total]").forEach(table => {
+        const total = parseInt(table.getAttribute("data-total") || 0);
+        if (total > maxInDB) maxInDB = total;
+    });
+
+    if (value < maxInDB) {
+        alert("Action Denied: One of your batches has " + maxInDB + " students. " +
+              "You cannot set the view limit lower than the actual student count.");
+        input.value = maxInDB; 
+        input.focus();
+        return false; 
+    }
+
+    localStorage.setItem("batchCount", value);
+    return true; 
+}
+</script>
+</div>
+{% endblock %}

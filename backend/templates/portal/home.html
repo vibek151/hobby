@@ -1,0 +1,57 @@
+{% extends 'portal/base.html' %}
+{% load static %}
+
+{% block content %}
+{% if notices %}
+<div class="bg-dark text-white py-2 shadow-sm">
+    <div class="container d-flex align-items-center">
+        <span class="badge bg-danger me-3">LATEST NEWS</span>
+        <marquee class="fw-bold">
+            {% for notice in notices %}
+                {{ notice.title }}: {{ notice.content }} &nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp;
+            {% endfor %}
+        </marquee>
+    </div>
+</div>
+{% endif %}
+
+<div class="bg-primary text-white py-5 shadow">
+    <div class="container text-center py-5">
+        <h1 class="display-3 fw-bold mb-3">Build Skills, Build Futures</h1>
+        <p class="lead mb-4 fs-4">Empowering students with industry-standard computer education.</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'admission' %}" class="btn btn-light btn-lg px-5 fw-bold shadow-sm">Apply Online Now</a>
+            <a href="{% url 'courses' %}" class="btn btn-outline-light btn-lg px-5">Explore Courses</a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold display-5">Our Popular Courses</h2>
+        <p class="text-muted">Managed directly from your Admin Portal</p>
+    </div>
+
+    <div class="row g-4">
+        {% for course in courses %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                {% if course.image %}
+                    <img src="{{ course.image.url }}" class="card-img-top" style="height: 220px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body p-4 text-center">
+                    <h4 class="fw-bold">{{ course.title }}</h4>
+                    <p class="text-muted small">{{ course.description|truncatewords:15 }}</p>
+                    <h5 class="text-primary fw-bold">₹{{ course.fees }}</h5>
+                    <a href="{% url 'admission' %}?course_id={{ course.id }}" class="btn btn-primary w-100 mt-3 rounded-pill">Enroll Now</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted fs-5 italic">No courses currently live. Add them in Admin!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

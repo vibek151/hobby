@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 11px;
+}
+
+.page {
+    page-break-after: always;
+    padding: 30px;
+}
+
+.header {
+    text-align: center;
+}
+
+.header img {
+    width: 70px;
+    position: absolute;
+    left: 40px;
+    top: 30px;
+}
+
+.institute-name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.tagline {
+    font-size: 10px;
+}
+
+.line {
+    border-bottom: 1px solid black;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 5px;
+    text-align: center;
+}
+
+th {
+    background: #d9d9d9;
+}
+
+.summary {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.footer {
+    position: absolute;
+    bottom: 40px;
+    width: 90%;
+    font-size: 9px;
+}
+
+.signature {
+    text-align: right;
+    margin-top: 40px;
+}
+
+</style>
+</head>
+
+<body>
+
+{% for item in course_data %}
+
+<div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+        <img src="{{ STATIC_ROOT }}/logo.jpg">
+        <div class="institute-name">SMART COMPUTER INSTITUTE</div>
+        <div class="tagline">Build Skills, Build Futures.....</div>
+        <div class="line"></div>
+        <div><strong>Payment Statement</strong></div>
+    </div>
+
+    <!-- STUDENT DETAILS -->
+    <div class="section-title">STUDENT DETAILS</div>
+
+    <p><strong>Status:</strong>
+        {% if item.is_active %}
+            Current Course
+        {% else %}
+            Previous Course (Upgraded)
+        {% endif %}
+    </p>
+
+    <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+    <p><strong>Name:</strong> {{ student.name }}</p>
+    <p><strong>Course:</strong> {{ item.course.name }}</p>
+    <p><strong>Admission Date:</strong> {{ item.enrollment.admission_date }}</p>
+    <p><strong>Total Course Fee:</strong> Rs. {{ item.enrollment.total_fee }}</p>
+
+    <!-- PAYMENT TABLE -->
+    <table>
+        <tr>
+            <th>Sl No</th>
+            <th>Receipt No</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Fine</th>
+            <th>Date</th>
+        </tr>
+
+        {% for payment in item.payments %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ payment.receipt_no }}</td>
+            <td>{{ payment.fee_type }}</td>
+            <td>Rs. {{ payment.amount }}</td>
+            <td>Rs. {{ payment.fine }}</td>
+            <td>{{ payment.payment_date }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No payments yet</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- SUMMARY -->
+    <div class="summary">
+        <p>Total Received: Rs. {{ item.total_paid }}</p>
+        <p>Total Fine: Rs. {{ item.total_fine }}</p>
+        <p>Remaining: Rs. {{ item.remaining }}</p>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        Generated on: {% now "d-m-Y | h:i A" %}
+        <div class="signature">
+            ___________________________<br>
+            Authorized Signatory
+        </div>
+    </div>
+
+</div>
+
+{% endfor %}
+
+</body>
+</html>

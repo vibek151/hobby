@@ -1,0 +1,51 @@
+{% extends "admin/object_history.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+
+<script>
+window.addEventListener("load", function () {
+
+    const currentUser = "{{ request.user.username|lower }}";
+
+    const tooltips = [];
+
+    {% for action in action_list %}
+    tooltips.push("{{ action.changes_text|default:'No details available'|escapejs }}");
+    {% endfor %}
+
+    setTimeout(function () {
+
+        const rows = document.querySelectorAll("#change-history tbody tr");
+
+        rows.forEach(function(row, index) {
+
+            let userCell = row.children[1];
+            let actionCell = row.children[2];
+
+            if (!userCell || !actionCell) return;
+
+            let text = userCell.innerText.trim().toLowerCase();
+
+            // 🔴 SUPERUSER
+            if (text === "ironman") {
+                userCell.innerHTML = "<b style='color:#dc3545;'>SUPERUSER</b>";
+            }
+
+            // 🔵 YOU
+            else if (text === currentUser) {
+                userCell.innerHTML = "<b style='color:#007bff;'>You</b>";
+            }
+
+            // 🔥 TOOLTIP
+            actionCell.title = tooltips[index] || "No details available";
+            actionCell.style.cursor = "pointer";
+
+        });
+
+    }, 300); // small delay ensures table exists
+
+});
+</script>
+
+{% endblock %}

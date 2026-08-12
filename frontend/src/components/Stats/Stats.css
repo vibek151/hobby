@@ -1,0 +1,144 @@
+/* ==========================
+   Statistics Section
+========================== */
+
+.stats {
+    max-width: 1100px; /* Slimmed down from 1200px */
+    margin: 0 auto;
+    padding: 40px 20px 60px; /* Reduced vertical padding to balance spacing between navbar and courses */
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px; /* Slightly tighter gap */
+}
+
+.stat-card {
+    width: 210px; /* Reduced from 240px */
+    min-height: 130px; /* Scaled down from 180px */
+
+    background: #ffffff;
+    padding: 24px 20px; /* Tighter internal padding */
+    border-radius: 16px; /* Slightly tighter radius for a sharper look */
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    box-shadow:
+        0 4px 12px rgba(15, 23, 42, .03),
+        0 8px 24px rgba(15, 23, 42, .04);
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px; /* Cleaner 4px accent bar */
+    background: #2563eb;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px); /* Subtle float instead of a dramatic jump */
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .08);
+}
+
+.stat-card h1 {
+    color: #2563eb;
+    font-size: 38px; /* Balanced size from 52px */
+    font-weight: 800;
+    margin: 0 0 6px; /* Tighter gap under number */
+    letter-spacing: -0.5px;
+}
+
+.stat-card p {
+    color: #64748b;
+    font-size: 14px; /* Clean, secondary tracking size from 18px */
+    font-weight: 500;
+    margin: 0;
+}
+
+/* ==========================
+   Skeleton Loading Shimmer
+========================== */
+.stat-card.skeleton {
+    pointer-events: none;
+    background: #ffffff;
+}
+
+.stat-card.skeleton::before {
+    background: #e2e8f0;
+}
+
+.skeleton-number {
+    width: 80px;
+    height: 38px;
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    margin: 0 auto 8px;
+    border-radius: 8px;
+}
+
+.skeleton-text {
+    width: 100px;
+    height: 16px;
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    margin: 0 auto;
+    border-radius: 4px;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ==========================
+   Responsive Breakpoints
+========================== */
+
+/* Tablet */
+@media (max-width: 768px) {
+    .stats {
+        padding: 30px 16px 40px;
+        gap: 16px;
+    }
+
+    .stat-card {
+        width: 190px;
+        padding: 20px 16px;
+        min-height: 110px;
+    }
+
+    .stat-card h1 {
+        font-size: 32px;
+    }
+
+    .stat-card p {
+        font-size: 13px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .stats {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 16px 30px;
+    }
+
+    .stat-card {
+        width: 100%;
+        max-width: 300px;
+        padding: 20px;
+        min-height: auto;
+    }
+
+    .stat-card h1 {
+        font-size: 34px;
+    }
+}

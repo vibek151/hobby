@@ -1,0 +1,56 @@
+<h2 style="color:#2c7be5;">Payment Receipt</h2>
+
+<p>Hello {{ student.name }},</p>
+
+<p>Your payment has been successfully received.</p>
+
+<hr>
+
+<table style="border-collapse: collapse; width: 100%; max-width: 500px;">
+    
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>Receipt No</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">RCPT - {{ receipt_no }}</td>
+    </tr>
+
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>Student ID</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">{{ student.student_id }}</td>
+    </tr>
+
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>Amount Received</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">₹{{ fee.amount }}</td>
+    </tr>
+
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>received Date</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">{{ fee.payment_date|date:"d M Y" }}</td>
+    </tr>
+
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>Late Fine</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">
+            {% if late_days > 0 %}
+                ₹{{ fine }} ({{ late_days }} days × 5)
+            {% else %}
+                ₹0
+            {% endif %}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>Total Paid</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">₹{{ total }}</td>
+    </tr>
+
+</table>
+
+<hr>
+
+<p>
+    Thank you for your payment.<br>
+    
+</p>
+
+<p><b>-Smart Computer Institute</b></p>

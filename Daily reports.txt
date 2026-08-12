@@ -1,0 +1,2 @@
+24.02.26 fee update, let the check the fine system tomorrow
+25.02.26 is published false > course completed false, is published true > course course completed true, upgrade visisble

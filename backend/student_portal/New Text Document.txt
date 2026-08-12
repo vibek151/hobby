@@ -1,0 +1,52 @@
+from django.utils import timezone
+from datetime import timedelta
+from django.core.mail import send_mail
+from .models import Fee, AutomationLog
+
+
+def run_fee_reminders():
+
+    today = timezone.now().date()
+
+    log, created = AutomationLog.objects.get_or_create(id=1)
+
+    if log.last_run == today:
+        return  # already ran today
+
+    fees = Fee.objects.select_related("enrollment__student").filter(
+        fee_type="MONTHLY"
+    )
+
+    for fee in fees:
+
+        student = fee.enrollment.student
+
+        if not student.email:
+            continue
+
+        due = fee.due_date
+
+        # 2 days before
+        if due == today + timedelta(days=2):
+
+            send_mail(
+                "Fee Reminder",
+                f"Dear {student.name}, your payment is due on {due}.",
+                "smartcomputerins2022@gmail.com",
+                [student.email],
+                fail_silently=True
+            )
+
+        # overdue reminders (5 days)
+        if due <= today <= due + timedelta(days=5):
+
+            send_mail(
+                "Payment Pending",
+                f"Your payment due on {due} is still pending.",
+                "smartcomputerins2022@gmail.com",
+                [student.email],
+                fail_silently=True
+            )
+
+    log.last_run = today
+    log.save()

@@ -1,0 +1,52 @@
+<h2 style="color:#2c7be5;">Certificate Issued</h2>
+
+<p>Hello {{ student.name }},</p>
+
+<p>Congratulations! 🎉 You have successfully completed your course.</p>
+
+<hr>
+
+<table style="border-collapse: collapse; width: 100%; max-width: 500px;">
+    
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>Student ID</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">
+            {{ student.student_id }}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>Course Completed</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">
+            {{ certificate.completed_course }}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>Certificate No</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">
+            {{ certificate.certificate_no }}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="border:1px solid #ddd; padding:8px;"><b>Marksheet No</b></td>
+        <td style="border:1px solid #ddd; padding:8px;">
+            {{ certificate.marksheet_no }}
+        </td>
+    </tr>
+
+</table>
+
+<hr>
+
+<p>
+    📎 Your Certificate and Marksheet are attached with this email.<br>
+Please download, keep them safe, and collect the hard copy from the institute.
+</p>
+
+<p>
+    Best wishes for your future.
+</p>
+
+<p><b>Smart Computer Institute</b></p>

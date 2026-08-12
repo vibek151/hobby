@@ -1,0 +1,12 @@
+/* Hide Django time shortcuts (clock icon + Now link) */
+.datetimeshortcuts {
+    display: none !important;
+}
+
+/* Keep time + AM/PM in same row */
+.form-row.field-start_time,
+.form-row.field-end_time {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}

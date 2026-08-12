@@ -1,0 +1,35 @@
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const params = new URLSearchParams(window.location.search);
+    const studentId = params.get("student_id");
+
+    if (!studentId) return;
+
+    // FULL absolute URL
+    fetch(window.location.origin + "/get-student-data/?student_id=" + studentId)
+        .then(res => res.json())
+        .then(data => {
+
+            console.log("DATA:", data);
+
+            const select = document.getElementById("id_admission_pay_via");
+
+            if (select) {
+                [...select.options].forEach(o => {
+                    if (o.value === data.admission_pay_via) {
+                        o.selected = true;
+                    }
+                });
+
+                select.dispatchEvent(new Event("change"));
+            }
+
+            const gender = document.getElementById("id_gender");
+            if (gender) gender.value = data.gender;
+
+        })
+        .catch(err => console.log("FETCH ERROR:", err));
+
+});
+</script>

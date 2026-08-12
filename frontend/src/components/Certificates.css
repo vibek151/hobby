@@ -1,0 +1,68 @@
+.certificate-title{
+    margin-bottom:25px;
+}
+
+.certificate-card{
+    background:white;
+    border-radius:24px;
+    padding:28px;
+    box-shadow:0 4px 20px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+/* .certificate-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 30px rgba(0,0,0,.12);
+} */
+
+.certificate-card h2{
+    color:#1e293b;
+    margin-bottom:12px;
+}
+
+.certificate-info{
+    color:#64748b;
+    font-size:17px;
+    margin:8px 0;
+}
+
+.certificate-buttons{
+    display:flex;
+    gap:15px;
+    margin-top:25px;
+}
+
+.certificate-btn{
+    background:linear-gradient(135deg,#10b981,#059669);
+    color:white;
+    border:none;
+    padding:14px 24px;
+    border-radius:14px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(16,185,129,.25);
+}
+
+.marksheet-btn{
+    background:linear-gradient(135deg,#3b82f6,#2563eb);
+    color:white;
+    border:none;
+    padding:14px 24px;
+    border-radius:14px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(59,130,246,.25);
+}
+
+.certificate-btn:hover,
+.marksheet-btn:hover{
+    transform:translateY(-2px);
+}
+.certificate-btn,
+.marksheet-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}

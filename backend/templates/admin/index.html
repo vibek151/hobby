@@ -1,0 +1,48 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+
+    <!-- ✅ LOGIN SUCCESS MESSAGE -->
+    {% if request.session.login_success %}
+        <ul class="messagelist">
+            <li class="success">
+                Welcome back, {{ request.user.username }}!
+            </li>
+        </ul>
+    {% endif %}
+
+
+    <!-- 🔥 DJANGO DEFAULT MESSAGES -->
+    {% if messages %}
+        <ul class="messagelist">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+
+    {{ block.super }}
+
+
+    <!-- ⏳ AUTO HIDE -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const boxes = document.querySelectorAll(".messagelist");
+
+        setTimeout(() => {
+            boxes.forEach(box => {
+                box.style.transition = "opacity 0.3s ease";
+                box.style.opacity = "0";
+
+                setTimeout(() => box.remove(), 300);
+            });
+        }, 2000);
+
+    });
+    </script>
+
+{% endblock %}

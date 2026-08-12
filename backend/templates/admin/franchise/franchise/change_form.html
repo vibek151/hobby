@@ -1,0 +1,241 @@
+{% extends "admin/change_form.html" %}
+
+{% block after_related_objects %}
+<div style="margin: 20px 0; padding: 20px; background: #ffffff; border: 1px solid #2c7be5; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+    <h3 style="margin-top: 0; color: #2c7be5; font-size: 16px;">Institute Verification Portal</h3>
+    <p style="font-size: 13px; color: #666;">Verification is required before saving any sensitive changes.</p>
+    
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <button type="button" id="btn-req-otp"
+            style="padding: 7px 18px; background: #28a745; color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: bold; font-size: 13px;">
+            Req OTP
+        </button>
+        
+        <input type="text" id="otp-input" placeholder="Enter OTP"
+            style="padding: 8px; border: 1px solid #ccc; border-radius: 6px; display: none; width: 120px;">
+        
+        <button type="button" id="btn-verify-now"
+            style="padding: 7px 18px; background: #17a2b8; color: white; border: none; border-radius: 16px; cursor: pointer; display: none; font-size: 13px;">
+            Verify Now
+        </button>
+        
+        <span id="verification-status" style="font-weight: bold; font-size: 14px;"></span>
+    </div>
+</div>
+
+<script>
+// 🔒 Disable SAVE initially
+const saveBtn = document.querySelector("input[name='_save']");
+if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.style.opacity = "0.5";
+    saveBtn.style.cursor = "not-allowed";
+}
+
+// 📧 Email field
+const emailInput = document.getElementById("id_email");
+
+// 🔁 Reset if email changes
+emailInput.addEventListener("input", function () {
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.style.opacity = "0.5";
+    }
+
+    const status = document.getElementById("verification-status");
+    if (status) {
+        status.innerText = "Email changed. Please verify again.";
+        status.style.color = "orange";
+    }
+});
+
+document.getElementById('btn-req-otp').addEventListener('click', function(e) {
+    e.preventDefault();
+
+    const btn = this;
+    const status = document.getElementById('verification-status');
+
+    // 🔒 prevent multiple clicks
+    if (btn.disabled) return;
+
+    // 🔥 SIMPLE FIELD CHECK (UNCHANGED)
+    const requiredFields = [
+        "id_manager_name",
+        "id_passport_photo",
+        "id_id_proof_number",
+        "id_institute_name",
+        "id_trade_license_number",
+        "id_institute_location",
+        "id_id_proof_file",
+        "id_signature",
+        "id_email",
+        "id_username"
+    ];
+
+    // Only require password on the Add Franchise page
+    const isAddPage = window.location.pathname.endsWith("/add/");
+    
+
+    if (isAddPage) {
+        requiredFields.push("id_password");
+    }
+    for (let id of requiredFields) {
+        let field = document.getElementById(id);
+
+        if (!field) continue;
+
+        if (field.type === "file") {
+
+            const hasNewFile = field.files && field.files.length > 0;
+
+            // Django shows "Currently:" when a file already exists
+            const hasExistingFile =
+                field.parentElement.textContent.includes("Currently:");
+
+            if (!hasNewFile && !hasExistingFile) {
+                alert("Please fill all fields before requesting OTP");
+                field.focus();
+                return;
+            }
+
+            continue;
+        }
+        else {
+            if (!field.value.trim()) {
+                alert("Please fill all fields before requesting OTP");
+                field.focus();
+                return;
+            }
+        }
+    }
+
+    // ✅ UI FEEDBACK START
+    btn.innerText = "Sending...";
+    btn.disabled = true;
+    btn.style.opacity = "0.6";
+
+    status.innerText = "Sending OTP...";
+    status.style.color = "blue";
+
+    const email = emailInput.value;
+
+    fetch("/franchise/send-email-otp/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: "email=" + encodeURIComponent(email)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.status === "sent") {
+
+            startResendTimer(btn);
+
+            document.getElementById('otp-input').style.display = 'inline-block';
+            document.getElementById('btn-verify-now').style.display = 'inline-block';
+
+            status.innerText = "OTP sent successfully";
+            status.style.color = "green";
+
+        } else {
+            // 🔁 restore button if failed
+            btn.innerText = "Req OTP";
+            btn.disabled = false;
+            btn.style.opacity = "1";
+
+            status.innerText = "Failed to send OTP";
+            status.style.color = "red";
+        }
+    })
+    .catch(() => {
+        // 🔁 network fail restore
+        btn.innerText = "Req OTP";
+        btn.disabled = false;
+        btn.style.opacity = "1";
+
+        status.innerText = "Network error";
+        status.style.color = "red";
+    });
+});
+function startResendTimer(btn) {
+    let timeLeft = 30;
+
+    btn.disabled = true;
+    btn.style.opacity = "0.6";
+
+    const interval = setInterval(() => {
+        btn.innerText = `Resend OTP (${timeLeft}s)`;
+        timeLeft--;
+
+        if (timeLeft < 0) {
+            clearInterval(interval);
+
+            btn.innerText = "Resend OTP";
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            btn.style.background = "#ffc107"; // yellow for resend
+        }
+    }, 1000);
+}
+// 🔐 VERIFY OTP
+document.getElementById('btn-verify-now').addEventListener('click', function() {
+
+    const otp = document.getElementById('otp-input').value;
+    if (!otp) return;
+
+    fetch("/franchise/verify-email-otp/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: "otp=" + encodeURIComponent(otp)
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.status === "verified") {
+
+            const status = document.getElementById('verification-status');
+            status.innerText = "✔ Email Verified";
+            status.style.color = "green";
+
+            document.getElementById('otp-input').style.display = 'none';
+            this.style.display = 'none';
+
+            // ✅ Update email badge
+            const badge = emailInput.parentElement.querySelector(".v-badge");
+            if (badge) {
+                badge.className = "v-badge v-verified";
+                badge.innerHTML = "✓ Verified";
+            }
+
+            // ✅ Hidden flag for backend
+            let hidden = document.getElementById("email_verified_input");
+            if (!hidden) {
+                hidden = document.createElement("input");
+                hidden.type = "hidden";
+                hidden.name = "email_verified_flag";
+                hidden.id = "email_verified_input";
+                document.querySelector("form").appendChild(hidden);
+            }
+            hidden.value = "true";
+
+            // ✅ ENABLE SAVE BUTTON
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.style.opacity = "1";
+                saveBtn.style.cursor = "pointer";
+            }
+
+        } else {
+            alert("Invalid OTP");
+        }
+    });
+});
+</script>
+
+{% endblock %}

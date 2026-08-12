@@ -1,0 +1,25 @@
+<div style="display:flex;align-items:center;gap:10px;">
+
+    <!-- File input -->
+    <input type="file" name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>
+
+    {% if widget.value %}
+        <!-- filename -->
+        <span style="font-weight:500;">
+            {{ widget.value.name|cut:"passport_photos/"|cut:"documents/"|cut:"last_qualification/" }}
+        </span>
+
+        <!-- delete -->
+        <a href="?{{ widget.name }}-clear=on"
+           style="background:#dc3545;color:white;padding:6px 10px;border-radius:6px;text-decoration:none;">
+           🗑
+        </a>
+
+        <!-- preview -->
+        <a href="{{ widget.value.url }}" target="_blank"
+           style="background:#198754;color:white;padding:6px 10px;border-radius:6px;text-decoration:none;">
+           👁
+        </a>
+    {% endif %}
+
+</div>

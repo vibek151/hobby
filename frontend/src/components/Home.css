@@ -1,0 +1,68 @@
+.home-container{
+
+    text-align:center;
+
+}
+
+.dashboard-cards{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(
+        auto-fit,
+        minmax(
+            220px,
+            1fr
+        )
+    );
+
+    gap:25px;
+
+    margin-top:50px;
+
+}
+
+.card{
+
+    border:1px solid #ddd;
+
+    border-radius:15px;
+
+    padding:30px;
+
+    box-shadow:
+    0 2px 8px
+    rgba(
+        0,
+        0,
+        0,
+        0.1
+    );
+
+    transition:0.3s;
+
+}
+
+.card:hover{
+
+    transform:
+    translateY(
+        -5px
+    );
+
+}
+
+.card h3{
+
+    margin-top:15px;
+
+}
+
+.card p{
+
+    margin-top:10px;
+
+    font-size:20px;
+
+}

@@ -1,0 +1,342 @@
+:root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-light: #eff6ff;
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --text-light: #94a3b8;
+    --bg-card: #ffffff;
+    --bg-page: #f8fafc;
+    --border-color: #f1f5f9;
+    --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.02);
+    --shadow-md: 0 16px 32px -8px rgba(15, 23, 42, 0.05);
+}
+
+/* CONTAINER RESET */
+.course-detail-container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 24px 24px 48px 24px;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: var(--text-main);
+}
+
+/* BREADCRUMBS REMOVED FROM VIEW DESIGN PATHWAYS */
+
+/* MASTER DASHBOARD CORE MATRIX GRID */
+.course-dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+}
+
+.dashboard-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* UNIFIED HERO HEADER CONTAINER CARD */
+.course-hero-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow-sm);
+}
+
+.course-code-badge {
+    display: inline-block;
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.course-hero-card h1 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+}
+
+.course-hero-card p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 24px 0;
+    max-width: 820px;
+}
+
+/* UPGRADED HERO METRICS ROW STYLES */
+.hero-metrics-row {
+    display: flex;
+    gap: 16px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 24px;
+}
+
+.metric-pill {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    min-width: 210px;
+}
+
+/* Duration Custom Branding Gradient */
+.metric-pill.pill-duration {
+    background: #eff6ff; 
+    background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+}
+.metric-pill.pill-duration .metric-icon-box {
+    background: #38bdf8;
+    color: #ffffff;
+}
+
+/* Registration Fees Custom Branding Gradient */
+.metric-pill.pill-registration {
+    background: #f0fdf4;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 1px solid #bbf7d0;
+}
+.metric-pill.pill-registration .metric-icon-box {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.metric-icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+.metric-icon-box svg { width: 20px; height: 20px; }
+
+.metric-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.metric-tagline {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.metric-hero-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+}
+
+/* STRUCTURAL DASHBOARD SECTION HOUSING CARDS */
+.dashboard-section-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow-sm);
+}
+
+.dashboard-section-card.syllabus-wrapper {
+    position: relative;
+    padding-bottom: 48px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.title-indicator { width: 4px; height: 18px; background: var(--primary); border-radius: 100px; }
+.title-indicator.green-accent { background: #16a34a; }
+.section-header h2 { font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0; }
+
+/* THE AUTO MODULE SPLIT DISPLAY ENGINE Grid */
+.scrollable-curriculum-viewport {
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.scrollable-curriculum-viewport::-webkit-scrollbar { width: 5px; }
+.scrollable-curriculum-viewport::-webkit-scrollbar-track { background: transparent; }
+.scrollable-curriculum-viewport::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+.scrollable-curriculum-viewport::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+.syllabus-modules-matrix {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.curriculum-module-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    border-left: 4px solid var(--primary);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.curriculum-module-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.03);
+    border-color: var(--primary);
+}
+
+.module-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.module-tag {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.module-item-header h4 { font-size: 15px; font-weight: 700; color: var(--text-main); margin: 0; }
+.module-subtopics-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.module-subtopics-list li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+.subtopic-dot { width: 4px; height: 4px; background: var(--text-light); border-radius: 50%; flex-shrink: 0; }
+.empty-module-fallback { font-size: 12px; color: var(--text-light); font-style: italic; margin: 0; }
+
+/* THE INDICATOR CUE FLOATING PROMPT BADGE */
+.scroll-hint-badge {
+    position: absolute;
+    bottom: 16px;
+    right: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border-color);
+    padding: 6px 14px;
+    border-radius: 100px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    pointer-events: none;
+    animation: pulseTransparency 2.5s infinite ease-in-out;
+}
+.scroll-hint-badge span { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.2px; text-transform: uppercase; }
+.hint-arrow { width: 12px; height: 12px; color: var(--primary); display: flex; animation: bounceOffset 1.5s infinite ease-in-out; }
+
+/* REQUISITE EXAMS TRACK SYSTEM GRID */
+.certifications-flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.cert-badge {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-main);
+}
+.cert-badge svg { width: 14px; height: 14px; color: #16a34a; flex-shrink: 0; }
+
+/* UNIFIED STICKY RIGHT COLUMN ASSIGNMENT BAR */
+.premium-action-sidebar-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 24px;
+}
+
+.sidebar-pricing-display {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+.pricing-label { font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 0.5px; }
+.pricing-digits-row { display: flex; align-items: baseline; margin-top: 2px; }
+.pricing-digits-row .currency { font-size: 18px; font-weight: 700; color: var(--text-main); }
+.pricing-digits-row .amount { font-size: 34px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+.pricing-digits-row .interval { font-size: 13px; color: var(--text-muted); margin-left: 4px; font-weight: 500; }
+
+.sidebar-perks-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.perk-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+.perk-item svg { width: 14px; height: 14px; color: var(--primary); flex-shrink: 0; }
+
+.sidebar-actions-group { display: flex; flex-direction: column; gap: 10px; }
+.primary-enroll-btn, .secondary-consult-btn {
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.primary-enroll-btn { background: var(--primary); color: #ffffff; border: none; }
+.primary-enroll-btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.secondary-consult-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.secondary-consult-btn:hover { background: #f8fafc; border-color: var(--text-light); }
+
+/* ASYNC FALLBACK STATUS TILES */
+.course-detail-status { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; color: var(--text-muted); font-weight: 500; }
+.shimmer-loader-circle { width: 36px; height: 36px; border: 3px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spinAxis 0.8s linear infinite; margin-bottom: 12px; }
+
+/* ANIMATION KEYFRAMES SYSTEMS */
+@keyframes bounceOffset { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(2px); } }
+@keyframes pulseTransparency { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+@keyframes spinAxis { to { transform: rotate(360deg); } }
+
+/* GLOBAL MEDIA VIEWPORTS RESPONSIVE BREAKDOWN RULES */
+@media(max-width: 1100px) {
+    .course-dashboard-grid { grid-template-columns: 1fr; gap: 24px; }
+    .premium-action-sidebar-card { position: static; }
+}
+@media(max-width: 768px) {
+    .syllabus-modules-matrix { grid-template-columns: 1fr; }
+    .course-detail-container { padding: 16px; }
+    .course-hero-card h1 { font-size: 28px; }
+    .hero-metrics-row { flex-direction: column; gap: 12px; }
+    .metric-pill { min-width: auto; }
+}

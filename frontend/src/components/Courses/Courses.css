@@ -1,0 +1,215 @@
+/* ==========================================================================
+   Upgraded Courses Grid Stylesheet
+   ========================================================================== */
+
+/* Section Outer Shell */
+.courses {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Header Framing */
+.courses-header-section {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.courses-header-section h2 {
+    font-size: 38px;
+    color: #0f172a;
+    margin: 0 0 12px 0;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.section-subtitle-line {
+    width: 48px;
+    height: 4px;
+    background: #2563eb;
+    margin: 0 auto;
+    border-radius: 100px;
+}
+
+/* Course Grid Matrix Layout */
+/* Course Grid Matrix Layout */
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 310px));
+    justify-content: center;
+    gap: 30px;
+}
+
+/* Premium Uniform Card Structure */
+.course-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+    border: 1px solid #f1f5f9;
+    text-decoration: none; /* Safe anchor reset */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card Hover Lift State */
+.course-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    border-color: #e2e8f0;
+}
+
+/* Aspect Ratio Image Container */
+.course-image-container {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.course-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.course-card:hover .course-image {
+    transform: scale(1.04);
+}
+
+.image-overlay-shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 60%, rgba(15, 23, 42, 0.02));
+}
+
+/* Card Information Body padding alignment */
+.course-card-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-grow: 1;
+    margin-bottom: 24px; /* Room for corner slider badge */
+}
+
+/* Program Code Badge tag styling */
+.course-card-badge {
+    align-self: flex-start;
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+/* Core Title Presentation */
+.course-card-title {
+    color: #0f172a;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Polished Minimalist Action bar */
+.card-action-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 24px 24px 24px;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 700;
+    transition: color 0.2s ease;
+}
+
+.card-action-trigger svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s ease;
+}
+
+.course-card:hover .card-action-trigger {
+    color: #1d4ed8;
+}
+
+.course-card:hover .card-action-trigger svg {
+    transform: translateX(3px);
+}
+
+/* Elegant Corner Triangular Dynamic Slide Engine (Upgraded to handle explicit interactive button) */
+.dashboard-slide-trigger {
+    position: absolute;
+    bottom: -90px;
+    right: -300px;
+    width: 260px;
+    height: 90px;
+    background: #0f172a;
+    border: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+}
+
+/* Internal Presentation Typography positioning inside clip-path shape */
+.dashboard-slide-trigger .slide-text {
+    color: #ffffff;
+    padding-right: 24px;
+    padding-bottom: 18px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Slide-in State Execution on Card Hover */
+.course-card:hover .dashboard-slide-trigger {
+    bottom: 0;
+    right: 0;
+}
+
+/* Micro-hover state when cursor specifically highlights the corner wedge */
+.dashboard-slide-trigger:hover {
+    background: #1e293b;
+}
+
+/* Mobile & Tablet Adaptation Optimization Channels */
+@media (max-width: 768px) {
+    .courses {
+        padding: 48px 16px;
+    }
+    .courses-header-section {
+        margin-bottom: 36px;
+    }
+    .courses-header-section h2 {
+        font-size: 28px;
+    }
+    .course-grid {
+        gap: 20px;
+    }
+    .course-image-container {
+        height: 160px;
+    }
+    .course-card-body {
+        padding: 20px;
+    }
+    .course-card-title {
+        font-size: 16px;
+    }
+}

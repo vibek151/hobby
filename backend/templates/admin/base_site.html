@@ -1,0 +1,696 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block usertools %}
+{% endblock %}
+{% block extrastyle %}
+{{ block.super }}
+<script src="{% static 'admin/js/ctrl_save.js' %}"></script>
+<script>
+(function () {
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark") {
+        document.documentElement.classList.add("dark-mode");
+    }
+})();
+
+
+
+
+</script>
+
+<style>
+/* ================= 0. THE CSS VARIABLE RESET ================= */
+/* This forces Django's internal system to stop using "white" for text in dark mode */
+:root, .dark-mode {
+    --body-fg: #0f172a !important;
+    --input-fg: #0f172a !important;
+    --input-focus-border: #94a3b8 !important;
+}
+
+
+.messagelist li.login-msg {
+    position: fixed;
+    top: 190px !important;
+    right: 20px;
+
+    background: #1e7e34;
+    color: #fff;
+
+    padding: 12px 18px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    /* border-radius: 8px; */
+
+    z-index: 9999;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+
+/* 🚫 REMOVE UNDERLINE FROM ICONS */
+#header #custom-nav a,
+#header #custom-nav a:hover,
+#header #custom-nav a:focus,
+#header #custom-nav a:active {
+    text-decoration: none !important;
+}
+
+/* 📌 FIX PAGE TITLE IN DARK MODE */
+html.dark-mode h1 {
+    color: #ffffff !important;
+}
+
+/* ===== FIX BREADCRUMB PERMANENTLY ===== */
+
+
+
+#header #custom-nav a,
+#header #custom-nav #theme-toggle {
+    margin-left: 0 !important;
+}
+
+
+/* ================= 1. HEADER & NAV ================= */
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: #2d4a63;
+}
+#user-tools { display: none !important; }
+#custom-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: white;
+}
+
+
+/* ===== FIXED HEADER (keep as you already have) ===== */
+#header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* ===== SIDEBAR (STICKY - NOT FIXED) ===== */
+#nav-sidebar {
+    position: sticky !important;
+    top: 60px; /* adjust if header height changes */
+
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+
+    z-index: 998;
+}
+
+/* ===== REMOVE OLD FORCED LAYOUT BREAK ===== */
+#content {
+    margin-left: 0 !important;   /* let Django handle layout */
+}
+
+/* OPTIONAL: smoother scrolling */
+#nav-sidebar {
+    scrollbar-width: thin;
+}
+
+/* 📌 MAKE BREADCRUMB STICKY */
+
+
+
+/* HEADER */
+#header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* BREADCRUMB (FINAL FIX) */
+
+
+/* SIDEBAR */
+#nav-sidebar {
+    position: sticky;
+    top: 100px;   /* header + breadcrumb */
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+/* ================= 2. THE LOGIN/RESET "FIREWALL" ================= */
+body.login, body.password-reset {
+    background: #0f172a !important; 
+}
+
+.login #content, .password-reset #content {
+    background: #ffffff !important;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    max-width: 400px;
+    margin: 80px auto;
+}
+
+/* Titles and Labels */
+.login h1, .password-reset h1,
+.login label, .password-reset label,
+.login p, .password-reset p {
+    color: #1e293b !important;
+    background: transparent !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+/* 🔥 THE INPUT FIX (FORCED COLORS) */
+/* We target the selectors very specifically to win over Django's dark.css */
+.login input[type="text"], 
+.login input[type="password"], 
+.password-reset input[type="email"],
+.password-reset input[type="text"] {
+    background-color: #b1bccd !important; 
+    color: #0f172a !important; 
+    border: 1px solid #94a3b8 !important;
+    border-radius: 6px !important;
+    font-weight: 700 !important;
+    padding: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    -webkit-text-fill-color: #0f172a !important; 
+}
+
+/* 🔥 THE FOCUS FIX (REMOVING THE CHANGE) */
+.login input:focus, 
+.password-reset input:focus {
+    background-color: #b1bccd !important; /* Stays blue-grey */
+    color: #0f172a !important;            /* Stays dark navy */
+    border: 1px solid #0f172a !important; 
+    outline: none !important;
+    box-shadow: none !important;           /* Kills the glow */
+    -webkit-text-fill-color: #0f172a !important;
+}
+
+/* The Button */
+.login .submit-row input, 
+.password-reset .submit-row input {
+    background-color: #5f7d95 !important;
+    color: white !important;
+    border-radius: 6px !important;
+    width: 100% !important;
+    height: 45px;
+    border: none !important;
+    font-weight: bold;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+/* ================= 3. INTERNAL DASHBOARD DARK MODE ================= */
+/* This handles everything EXCEPT the login and reset cards */
+html.dark-mode:not(.login):not(.password-reset) {
+    background-color: #0f172a !important;
+}
+
+html.dark-mode:not(.login):not(.password-reset) #content,
+html.dark-mode:not(.login):not(.password-reset) #container {
+    background-color: #000000 !important;
+}
+
+html.dark-mode:not(.login):not(.password-reset) .module {
+    background-color: #000000 !important;
+    color: #f0e2e2 !important;
+}
+
+
+/* ===== FINAL SCROLL FIX (WORKING) ===== */
+
+/* ===== DISABLE SCROLL ONLY FOR AUTH PAGES ===== */
+
+/* Login + Password Reset */
+body.login,
+body.password-reset {
+    overflow: hidden !important;
+}
+
+/* Fix container overflow */
+body.login #container,
+body.password-reset #container {
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+/* Fix layout overflow (IMPORTANT) */
+body.login #content,
+body.password-reset #content {
+    position: fixed;
+    inset: 60px 0 0 0;
+}
+
+
+
+/* ===== DARK MODE INPUT FIX (GLOBAL) ===== */
+html.dark-mode input,
+html.dark-mode textarea,
+html.dark-mode select {
+    background-color: #5f5f5f !important;
+    color: #ffffff !important;
+    border: 1px solid #5f5f5f !important;
+}
+
+/* Fix placeholder color */
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+    color: #e2e8f0 !important;
+    opacity: 0.8;
+}
+
+/* Fix focus state */
+html.dark-mode input:focus,
+html.dark-mode textarea:focus,
+html.dark-mode select:focus {
+    background-color: #5f5f5f !important;
+    color: #ffffff !important;
+    border-color: #94a3b8 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Fix Django special widgets (date, select, etc.) */
+html.dark-mode .vTextField,
+html.dark-mode .vDateField,
+html.dark-mode .vTimeField,
+html.dark-mode .vURLField,
+html.dark-mode .vIntegerField,
+html.dark-mode .vForeignKeyRawIdAdminField {
+    background-color: #5f5f5f !important;
+    color: #ffffff !important;
+}
+
+
+/* ===== TOP RIGHT ADD BUTTON ONLY ===== */
+.object-tools {
+    margin-bottom: 10px;
+}
+
+.object-tools li a {
+    background: #5f7d95 !important;
+    color: #ffffff !important;
+    padding: 8px 18px !important;
+    border-radius: 999px !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    border: none !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.25s ease;
+}
+
+/* Hover */
+.object-tools li a:hover {
+    background: #4a667c !important;
+    transform: translateY(-1px);
+}
+
+/* Click */
+.object-tools li a:active {
+    transform: scale(0.96);
+}
+
+
+
+
+
+/* css */
+
+/* 🔒 FIX HEADER (TOP BAR) */
+#header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* OPTIONAL: FIX BREADCRUMB BAR ALSO */
+
+
+/* ENSURE CONTENT SCROLLS PROPERLY */
+/* #content {
+    overflow-y: auto;
+} */
+
+
+/* icon style */
+
+
+/* 🔝 TEXT (Welcome user) */
+#header #user-tools {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* 👤 USERNAME */
+#header #user-tools strong {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* 🎯 ICONS (GLASS BOX) */
+/* 🎯 TARGET ONLY ICON LINKS (NOT TEXT) */
+#header #custom-nav a,
+#header #custom-nav #theme-toggle {
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    width: 30px;
+    height: 30px;
+
+    margin-left: 6px;
+
+    border-radius: 8px;
+
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(6px);
+
+    border: 1px solid rgba(255,255,255,0.2);
+
+    font-size: 16px;
+
+    transition: all 0.25s ease;
+}
+
+/* 🧾 REMOVE ANY BOX FROM TEXT */
+#header #custom-nav span:not(#theme-toggle),
+#header #user-tools {
+
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: rgb(235, 210, 128);
+    font-size: larger;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    display: inline !important;
+}
+
+
+/* ✨ HOVER EFFECT */
+#header #custom-nav a:hover,
+#header #custom-nav span:hover {
+    background: rgba(79,140,255,0.3);
+    border-color: rgba(79,140,255,0.7);
+
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(79,140,255,0.3);
+}
+
+/* 🌙 DARK MODE */
+html.dark-mode #header #custom-nav a,
+html.dark-mode #header #custom-nav span {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+html.dark-mode #header #custom-nav a:hover,
+html.dark-mode #header #custom-nav span:hover {
+    background: rgba(79,140,255,0.4);
+}
+
+
+/* ✅ SHOW DJANGO MESSAGES PROPERLY */
+.messagelist {
+    margin: 10px 20px;
+    padding: 10px;
+}
+
+/* Error message */
+.messagelist li.error {
+    background: #5a1a1a !important;
+    color: #ffcccc !important;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* Success message */
+.messagelist li.success {
+    background: #1a5a2b !important;
+    color: #ccffdd !important;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* Remove empty gap */
+.messagelist:empty {
+    display: none;
+}
+
+
+
+
+/* ✅ FIX HEADER */
+#header {
+    position: sticky !important;
+    top: 0;
+    z-index: 1000;
+}
+
+
+/* ✅ FINAL BREADCRUMB FIX */
+div.breadcrumbs {
+    position: sticky !important;
+    top: 50px;   /* header height */
+    z-index: 999;
+
+    background: #2d4a63 !important;
+    padding: 10px 20px;
+}
+
+
+/* 🔥 FORCE STICKY TO WORK (Django fix) */
+#container {
+    overflow: visible !important;
+}
+
+#content {
+    overflow: visible !important;
+}
+
+
+/* ===== FINAL LOCKED HEADER SYSTEM ===== */
+
+/* Header (already fixed style) */
+#header {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+/* Breadcrumb (FORCED FIXED) */
+div.breadcrumbs {
+    position: fixed !important;
+    top: 50px;   /* height of header */
+    left: 0;
+    right: 0;
+    z-index: 999;
+
+    background: #2d4a63 !important;
+    padding: 10px 20px;
+}
+
+/* Content spacing (IMPORTANT) */
+#content {
+    margin-top: 100px !important;  /* header + breadcrumb height */
+}
+
+/* 🔥 FIX DJANGO MESSAGE VISIBILITY */
+.messagelist {
+    position: fixed;
+    top: 48px;
+    left: 300px;
+    right: 0;
+    z-index: 2000;
+
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    justify-content: flex-end;
+}
+
+
+.messagelist li {
+    display: inline-block;
+
+    background: #7a1f1f;
+    color: #ffdddd;
+
+    padding: 10px 16px;
+    border-radius: 8px;
+
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+
+    white-space: nowrap;   /* 🔥 NO WRAP */
+    width: fit-content;    /* grow with text */
+    max-width: none;       /* remove width limit */
+}
+
+/* Fix success message text visibility */
+.messagelist li.success {
+    background: #1e5f2e !important;
+    color: #ffffff !important;
+}
+
+/* 🔥 Fix highlighted / link text inside message */
+.messagelist li.success a,
+.messagelist li.success strong {
+    color: #ffd966 !important;   /* golden highlight */
+    font-weight: 600;
+}
+
+/* 🔥 Fix "Go" button in dark mode */
+html.dark-mode .actions input[type="submit"],
+html.dark-mode .actions button {
+    background-color: #5f7d95 !important;  /* same as your theme */
+    color: #ffffff !important;
+
+    border: 1px solid #5f7d95 !important;
+    border-radius: 6px;
+
+    padding: 4px 10px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+/* Hover effect */
+html.dark-mode .actions input[type="submit"]:hover,
+html.dark-mode .actions button:hover {
+    background-color: #4a667c !important;
+}
+
+
+/* Off-white text for dark mode */
+html.dark-mode .left-controls {
+    color: #e2e8f0 !important;
+}
+
+/* Input styling */
+html.dark-mode .left-controls input {
+    color: #e2e8f0 !important;
+    background-color: #5f5f5f !important;
+    border: 1px solid #888 !important;
+}
+
+/* Label safety */
+html.dark-mode .left-controls label {
+    color: #e2e8f0 !important;
+}
+
+
+/* More specific: only delete page */
+.dark-mode body.delete-confirmation h1,
+.dark-mode body.delete-confirmation h2,
+.dark-mode body.delete-confirmation p,
+.dark-mode body.delete-confirmation li {
+    color: #fbf7ee !important;
+}
+
+/* Fix Recent actions text in dark mode */
+.dark-mode #content-related h2,
+.dark-mode #content-related,
+.dark-mode .module h2 {
+    color: #fbf7ee !important;
+}
+
+
+
+/* Separate background for Recent Actions (no position change) */
+.dark-mode #content-related {
+    background-color: #1f1f1f !important;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+/* Inner card look */
+.dark-mode #content-related .module {
+    background-color: #2a2a2a !important;
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #3a3a3a;
+}
+
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name" style="margin:0; color:white;">Admin Panel</h1>
+{% endblock %}
+
+{% block nav-global %}
+<div id="custom-nav">
+    {% if request.user.is_authenticated %}
+        <span>Welcome, <b>{{ request.user.username }}</b></span>
+        <a href="/" title="View Site">🌐</a>
+        <a href="{% url 'admin:password_change' %}" title="Change Password">🔒</a>
+        <a href="{% url 'admin:logout' %}" title="Logout">🚪</a>
+    {% endif %}
+    <span id="theme-toggle" title="Toggle Theme" style="font-size: 1.2rem; cursor: pointer;">🌙</span>
+</div>
+
+<script>
+const toggle = document.getElementById("theme-toggle");
+if (localStorage.getItem("theme") === "dark") {
+    toggle.textContent = "☀️";
+}
+
+toggle.onclick = function () {
+    const isDark = document.documentElement.classList.contains("dark-mode");
+    localStorage.setItem("theme", isDark ? "light" : "dark");
+    location.reload();
+};
+
+
+
+setInterval(() => {
+
+    const currentPath = window.location.pathname;
+
+    // ❌ DO NOT RUN ON THESE PAGES
+    if (
+        currentPath.includes("/franchise/restricted") ||
+        currentPath.includes("/admin/login") ||
+        currentPath.includes("/forgot") ||
+        currentPath.includes("/password_reset") ||
+        currentPath.includes("/reset")
+    ) {
+        return;
+    }
+
+    fetch("/franchise/check-restriction/")
+    .then(res => res.json())
+    .then(data => {
+
+        console.log("CHECK:", data, "PATH:", currentPath);
+
+        // 🔴 ONLY redirect if not already restricted
+        if (data.restricted === true) {
+            window.location.href = "/franchise/restricted/";
+        }
+
+    })
+    .catch(err => console.error(err));
+
+}, 2000);
+</script>
+{% endblock %}
+
+
+
+
+
+

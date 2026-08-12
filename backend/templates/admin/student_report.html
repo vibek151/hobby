@@ -1,0 +1,51 @@
+<h1>Student Report</h1>
+
+<h2>Personal Details</h2>
+<p>Name: {{ student.name }}</p>
+<p>Student ID: {{ student.student_id }}</p>
+<p>Phone: {{ student.phone }}</p>
+<p>Gender: {{ student.gender }}</p>
+<p>Address: {{ student.address }}</p>
+
+<hr>
+
+<h2>Documents</h2>
+{% if student.passport_photo %}
+    <p><a href="{{ student.passport_photo.url }}">Passport Photo</a></p>
+{% endif %}
+{% if student.document_file %}
+    <p><a href="{{ student.document_file.url }}">Document</a></p>
+{% endif %}
+
+<hr>
+
+<h2>Course History</h2>
+{% for h in history %}
+    <p>
+        Course: {{ h.course }} |
+        Duration: {{ h.course_duration }} |
+        Completed: {{ h.course_completed }}
+    </p>
+{% endfor %}
+
+<hr>
+
+<h2>Payment History</h2>
+{% for p in payments %}
+    <p>
+        Date: {{ p.payment_date }} |
+        Amount: ₹{{ p.amount }} |
+        Receipt: {{ p.receipt_no }}
+    </p>
+{% endfor %}
+
+<hr>
+
+<h2>Exam / Certificate</h2>
+{% for c in certificates %}
+    <p>
+        Exam Date: {{ c.upload_date }} |
+        Marks: {{ c.marks_obtained }} /
+        {{ c.total_marks }}
+    </p>
+{% endfor %}

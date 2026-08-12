@@ -1,0 +1,66 @@
+{% extends 'portal/base.html' %}
+{% load static %}
+
+{% block title %}Home - Smart Computer Institute{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Build Skills, Build Futures</h1>
+        <p class="lead">Empowering students with industry-standard computer education.</p>
+        <a href="{% url 'admission' %}" class="btn btn-light btn-lg">Apply Online Now</a>
+    </div>
+</div>
+
+<div class="container py-5">
+    <h2 class="text-center mb-4">Our Popular Courses</h2>
+    <div class="row">
+        {% for course in courses %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if course.image %}
+                <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ course.title }}</h5>
+                    <p class="card-text text-muted">{{ course.description|truncatewords:20 }}</p>
+                    <p class="fw-bold text-primary">Fee: Rs. {{ course.fees }}</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-3">
+                    <a href="{% url 'admission' %}" class="btn btn-outline-primary w-100">Enroll Now</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No courses available at the moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'courses' %}" class="btn btn-secondary">View All Courses</a>
+    </div>
+</div>
+
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <i class="bi bi-laptop fs-1 text-primary"></i>
+                <h3>Modern Labs</h3>
+                <p>Fully equipped computer labs with high-speed internet.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-patch-check fs-1 text-primary"></i>
+                <h3>Certified Courses</h3>
+                <p>Get recognized certifications upon course completion.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-person-workspace fs-1 text-primary"></i>
+                <h3>Expert Trainers</h3>
+                <p>Learn from professionals with years of industry experience.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

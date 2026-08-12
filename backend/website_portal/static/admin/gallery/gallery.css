@@ -1,0 +1,14 @@
+.results tbody {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.results tr {
+    display: block;
+    border: none !important;
+}
+
+.results td {
+    border: none !important;
+}

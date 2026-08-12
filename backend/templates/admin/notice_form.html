@@ -1,0 +1,315 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<style>
+/* 🌐 BASE (LIGHT MODE - keep your design) */
+.notice-wrapper *, .notice-wrapper *::before, .notice-wrapper *::after { box-sizing: border-box; }
+
+.notice-wrapper {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* 🌙 DARK MODE OVERRIDE */
+html.dark-mode .notice-wrapper {
+    background: #121212 !important;
+    color: #e6e6e6 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    border: 1px solid #2a2a2a;
+}
+
+/* 🔹 LAYOUT */
+.top-row { display: flex; gap: 20px; margin-bottom: 20px; }
+.title-box, .student-box { width: 50%; }
+
+/* 🏷️ LABELS */
+.title-box label, .student-box label, .body-box label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #444;
+}
+
+/* 🌙 DARK LABELS */
+html.dark-mode .notice-wrapper label {
+    color: #cfcfcf !important;
+}
+
+/* ✏️ INPUTS */
+#id_title, #id_body,
+.select2-container--default .select2-selection--multiple {
+    width: 100% !important;
+    border: 1px solid #ccc !important;
+    border-radius: 6px !important;
+}
+
+#id_title { padding: 10px; }
+#id_body { min-height: 200px; padding: 10px; }
+
+/* 🌙 DARK INPUTS */
+
+
+/* ✨ FOCUS */
+html.dark-mode #id_title:focus,
+html.dark-mode #id_body:focus {
+    background: #252525 !important;
+    border-color: #4f8cff !important;
+}
+
+/* 📚 SELECT2 DROPDOWN */
+html.dark-mode .select2-dropdown {
+    background: #1e1e1e !important;
+    color: #fff !important;
+}
+
+
+/* 🌙 FIX PAGE TITLE */
+html.dark-mode h1 {
+    color: #ffffff !important;
+}
+
+
+
+
+/* 📏 BOTTOM SECTION */
+.bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* 🌙 DARK BORDER */
+html.dark-mode .bottom-row {
+    border-top: 1px solid #2a2a2a;
+}
+
+/* 🚫 HIDE DEFAULT ADMIN BUTTON */
+.submit-row { display: none !important; }
+
+/* 🔘 BUTTON */
+.notice-post-btn {
+    background: #2c7be5;
+    color: white;
+    padding: 12px 45px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* 🌙 DARK BUTTON */
+html.dark-mode .notice-post-btn {
+    background: linear-gradient(135deg, #3a6ea5, #4f8cff);
+}
+
+.notice-post-btn:hover { background: #1a68d1; }
+
+
+/* 🌙 REMOVE GREY BACKGROUND (REAL FIX) */
+html.dark-mode .select2-container--default .select2-search--inline .select2-search__field {
+    background-color: transparent !important;
+    color: #ffffff !important;
+}
+
+/* 🌙 ALSO FORCE MAIN BOX CLEAN */
+
+
+html.dark-mode .select2-container--default.select2-container--focus 
+.select2-selection--multiple {
+    border: 1px solid rgba(79, 140, 255, 0.6) !important;
+    box-shadow: 0 0 0 1px rgba(79, 140, 255, 0.2);
+}
+
+
+/* 🌙 REMOVE ANY INNER GREY LAYER */
+html.dark-mode .select2-selection__rendered {
+    background-color: transparent !important;
+}
+
+/* 🌙 FINAL CLEAN SELECT2 STYLE */
+html.dark-mode .select2-container--default .select2-selection--multiple {
+    background-color: #1e1e1e !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+    transition: all 0.2s ease;
+}
+
+/* ✨ FOCUS EFFECT */
+html.dark-mode .select2-container--default.select2-container--focus 
+.select2-selection--multiple {
+    box-shadow: inset 0 0 0 1px rgba(79,140,255,0.6),
+                0 0 6px rgba(79,140,255,0.2);
+}
+
+
+
+/* 🌙 UNIFY ALL INPUT FIELDS */
+html.dark-mode input,
+html.dark-mode textarea,
+html.dark-mode select {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+    padding: 8px 10px;
+    transition: all 0.2s ease;
+}
+
+/* ✨ FOCUS EFFECT */
+html.dark-mode input:focus,
+html.dark-mode textarea:focus,
+html.dark-mode select:focus {
+    box-shadow: inset 0 0 0 1px rgba(79,140,255,0.6),
+                0 0 6px rgba(79,140,255,0.2);
+    outline: none;
+}
+
+
+
+/* 🌙 CHIP FIX (STRUCTURE + SPACING) */
+html.dark-mode .select2-container--default 
+.select2-selection--multiple 
+.select2-selection__choice {
+
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 10px !important;
+    border-radius: 6px;
+
+    background-color: rgba(79, 140, 255, 0.15) !important;
+    color: #cfe1ff !important;
+    border: 1px solid rgba(79, 140, 255, 0.3) !important;
+}
+
+/* ❌ REMOVE ICON FIX (REAL FIX HERE) */
+html.dark-mode .select2-selection__choice__remove {
+    position: relative !important;   /* override Select2 default */
+    margin-right: 6px !important;    /* spacing */
+    margin-left: 0 !important;
+    top: 0 !important;
+    color: #9bbcff !important;
+    font-size: 14px;
+}
+
+/* 🧠 TEXT ALIGN FIX */
+html.dark-mode .select2-selection__choice__display {
+    display: inline-block;
+}
+
+
+/* ☀️ MATCH LIGHT MODE SPACING WITH DARK */
+.select2-container--default 
+.select2-selection--multiple 
+.select2-selection__choice__remove {
+
+    position: relative;
+    margin-right: 6px !important;
+    margin-left: 0 !important;
+    top: 0;
+
+    font-size: 14px;
+}
+
+
+/* ☀️ MATCH CHIP STRUCTURE */
+.select2-container--default 
+.select2-selection--multiple 
+.select2-selection__choice {
+
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px !important;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notice-wrapper">
+    <form method="post" id="notice_form" novalidate>
+        {% csrf_token %}
+        {{ adminform.form.non_field_errors }}
+        
+        <input type="hidden" name="_save" value="Send Notice">
+        
+        {% if is_popup %}<input type="hidden" name="_popup" value="1">{% endif %}
+        {% if is_popup %}
+        <input type="hidden" name="_popup" value="1">
+        {% endif %}
+
+        {% if adminform.form.franchise %}
+        <div style="margin-bottom:20px;">
+
+            {{ adminform.form.franchise.label_tag }}
+
+            {{ adminform.form.franchise.errors }}
+
+            {{ adminform.form.franchise }}
+
+        </div>
+        {% endif %}
+
+
+        <div class="top-row">
+            <div class="title-box">
+                {{ adminform.form.title.label_tag }}
+                {{ adminform.form.title.errors }}
+                {{ adminform.form.title }}
+            </div>
+            <div class="student-box">
+                {{ adminform.form.students.label_tag }}
+                
+                {{ adminform.form.students.errors }} 
+                
+                {{ adminform.form.students }}
+            </div>
+        </div>
+        <div class="body-box">
+            {{ adminform.form.body.label_tag }}
+            {{ adminform.form.body.errors }}
+            {{ adminform.form.body }}
+        </div>
+        <div class="bottom-row">
+            <div>
+                {{ adminform.form.scheduled_time.label_tag }}
+                {{ adminform.form.scheduled_time.errors }}
+                {{ adminform.form.scheduled_time }}
+            </div>
+            <input type="submit" value="Send Notice" class="notice-post-btn" name="_save">
+        </div>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    (function($) {
+        $(document).ready(function() {
+            // Target the Django ID
+            var $studentSelect = $('#id_students');
+
+            $studentSelect.select2({
+                placeholder: "Select incomplete students...",
+                allowClear: true,
+                width: '100%',
+                // This ensures it displays the pre-loaded students (Rtret & Ferfer)
+                minimumResultsForSearch: 0 
+            });
+        });
+    })(jQuery || django.jQuery);
+</script>
+{% endblock %}

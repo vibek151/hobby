@@ -1,0 +1,90 @@
+.history-container{
+    padding:20px;
+}
+
+.history-title{
+    margin-bottom:35px;
+}
+
+.timeline-item{
+    display:flex;
+    align-items:stretch;
+    gap:15px;
+    margin-bottom:30px;
+}
+
+.timeline-left{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding-top:25px;
+}
+
+.timeline-circle{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+}
+
+.running-circle{
+    background:#22c55e;
+}
+
+.completed-circle{
+    background:#ef4444;
+}
+
+.timeline-line{
+    width:3px;
+    flex:1;
+    min-height:40px;
+    background:#e5e7eb;
+    margin-top:8px;
+}
+
+.history-card{
+    flex:1;
+    background:white;
+    border-radius:20px;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+    overflow:hidden;
+    border-left:5px solid #ef4444;
+}
+
+.history-card summary{
+    list-style:none;
+    cursor:pointer;
+    padding:22px 25px;
+    font-size:22px;
+    font-weight:600;
+    color:#475569;
+}
+
+.history-card summary::-webkit-details-marker{
+    display:none;
+}
+
+.course-details{
+    padding:0 20px 20px;
+}
+
+.detail-row{
+    display:flex;
+    justify-content:space-between;
+    padding:15px 0;
+    border-bottom:1px solid #f1f5f9;
+}
+
+.status-running{
+    background:#22c55e;
+    color:white;
+    padding:6px 16px;
+    border-radius:20px;
+}
+
+.status-completed{
+    background:#ef4444;
+    color:white;
+    padding:6px 16px;
+    border-radius:20px;
+}

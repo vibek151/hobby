@@ -1,0 +1,238 @@
+/* ==========================================================================
+   SIPA CHATBOT BOTTOM-RIGHT FLOATING LAYOUT
+   ========================================================================== */
+
+/* Full screen transparent overlay click capturer */
+.smart-assistant-backdrop-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(15, 23, 42, 0.4) !important; /* Dims background */
+    z-index: 99999 !important;
+    display: block !important;
+}
+
+/* Constrained Window Box - Forced into the bottom right corner */
+.assistant-window {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    width: 380px !important;
+    height: 600px !important;
+    max-height: 85vh !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #e2e8f0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    animation: chatSlideIn 0.3s ease-out !important;
+}
+
+@keyframes chatSlideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Compact Dark Header */
+.assistant-header {
+    background: #0f172a !important;
+    padding: 15px 20px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+
+.profile-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.mini-avatar {
+    width: 35px !important;
+    height: 35px !important;
+    background: #2563eb !important;
+    border-radius: 50% !important;
+    color: white !important;
+    font-weight: bold !important;
+    font-size: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.text-group h3 {
+    color: #ffffff !important;
+    margin: 0 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+.status-badge {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 12px !important;
+    color: #94a3b8 !important;
+}
+
+.green-dot {
+    width: 8px !important;
+    height: 8px !important;
+    background: #10b981 !important;
+    border-radius: 50% !important;
+}
+
+/* Explicit Close Button Styling */
+.dismiss-btn {
+    background: transparent !important;
+    border: none !important;
+    color: #ef4444 !important; /* Distinct red for visibility */
+    font-size: 22px !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    line-height: 1 !important;
+    transition: transform 0.2s ease !important;
+}
+
+.dismiss-btn:hover {
+    transform: scale(1.2) !important;
+}
+
+/* Scrollable Body Space */
+.assistant-body {
+    flex: 1 !important;
+    padding: 20px !important;
+    overflow-y: auto !important;
+    background: #f8fafc !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+}
+
+.msg-row { display: flex !important; width: 100% !important; }
+.msg-row.ai { justify-content: flex-start !important; }
+.msg-row.user { justify-content: flex-end !important; }
+
+/* Chat Card Bubbles */
+.bubble-card {
+    max-width: 85% !important;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    position: relative !important;
+}
+
+.ai .bubble-card {
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+    border-bottom-left-radius: 2px !important;
+}
+
+.user .bubble-card {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-bottom-right-radius: 2px !important;
+}
+
+.bubble-time {
+    display: block !important;
+    font-size: 10px !important;
+    margin-top: 5px !important;
+    opacity: 0.7 !important;
+}
+
+/* Footer Section Grid */
+.chatbot-footer-options {
+    background: #ffffff !important;
+    padding: 15px !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+
+.footer-title {
+    font-size: 12px !important;
+    color: #64748b !important;
+    margin-bottom: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+}
+
+.options-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+}
+
+.options-grid button {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    padding: 10px !important;
+    font-size: 12px !important;
+    color: #334155 !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.options-grid button:hover:not(:disabled) {
+    background: #eff6ff !important;
+    border-color: #3b82f6 !important;
+    color: #2563eb !important;
+}
+
+.options-grid button:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+/* Custom Scrollbar */
+.assistant-body::-webkit-scrollbar { width: 6px !important; }
+.assistant-body::-webkit-scrollbar-track { background: transparent !important; }
+.assistant-body::-webkit-scrollbar-thumb { background: #cbd5e1 !important; border-radius: 10px !important; }
+
+/* ==========================================================================
+   SIPA FLOATING ACTION TRIGGER BUTTON
+   ========================================================================== */
+.sipa-floating-trigger {
+    position: fixed !important;
+    bottom: 25px !important;
+    right: 25px !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 12px 20px !important;
+    border-radius: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    z-index: 99998 !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.sipa-floating-trigger:hover {
+    transform: translateY(-3px) scale(1.03) !important;
+    box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.5) !important;
+    background: #1d4ed8 !important;
+}
+
+.sipa-trigger-icon {
+    font-size: 18px !important;
+}
+
+.sipa-trigger-badge {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+}

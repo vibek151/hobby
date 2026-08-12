@@ -1,0 +1,22 @@
+<tbody>
+{% for student in students %}
+<tr>
+    <td>{{ student.student_id }} - {{ student.name }}</td>
+
+    <td>₹{{ student.total_paid|default:"0" }}</td>
+
+    <td>
+        {% for fee in student.fees.all %}
+            {{ fee.receipt_no }}
+            {% if not forloop.last %}, {% endif %}
+        {% empty %}
+            No Payment
+        {% endfor %}
+    </td>
+
+    <td>
+        <a href="#">Statement</a>
+    </td>
+</tr>
+{% endfor %}
+</tbody>

@@ -1,0 +1,32 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<h1>Fee Statement</h1>
+
+<h2>{{ student.student_id }} - {{ student.name }}</h2>
+
+<table border="1" cellpadding="8" style="border-collapse: collapse;">
+    <tr>
+        <th>Receipt No</th>
+        <th>Amount</th>
+        <th>Payment Date</th>
+        <th>Due Date</th>
+    </tr>
+
+    {% for fee in fees %}
+    <tr>
+        <td>{{ fee.receipt_no }}</td>
+        <td>₹{{ fee.amount }}</td>
+        <td>{{ fee.payment_date }}</td>
+        <td>{{ fee.due_date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>Total Paid: ₹{{ total_paid }}</h3>
+
+<br>
+<button onclick="window.print()">Print</button>
+
+{% endblock %}
