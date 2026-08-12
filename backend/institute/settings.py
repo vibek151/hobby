@@ -4,9 +4,20 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ================= SECURITY =================
-SECRET_KEY = "django-insecure-change-this-secret-key"
-DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.29.249"]
+# SECRET_KEY = "django-insecure-change-this-secret-key"
+# DEBUG = True
+# ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.29.249"]
+import os
+
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get("ALLOWED_HOSTS", "").split(",")
+    if host.strip()
+]
 
 # ================= INSTALLED APPS =================
 INSTALLED_APPS = [
