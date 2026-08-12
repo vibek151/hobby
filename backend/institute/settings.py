@@ -1,4 +1,6 @@
+import os
 from pathlib import Path
+import dj_database_url
 
 # ================= BASE DIR =================
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -7,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = "django-insecure-change-this-secret-key"
 # DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.29.249"]
-import os
+
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
@@ -78,16 +80,24 @@ WSGI_APPLICATION = "institute.wsgi.application"
 
 # ================= DATABASE =================
 # ================= DATABASE (PostgreSQL for Multi-Tenant) =================
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'test_database',  # <--- Change this if your DB has a different name
+#         'USER': 'postgres',
+#         'PASSWORD': 'SmartCompute@Umabbe', 
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_database',  # <--- Change this if your DB has a different name
-        'USER': 'postgres',
-        'PASSWORD': 'SmartCompute@Umabbe', 
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
+    "default": dj_database_url.parse(
+        os.environ["DATABASE_URL"]
+    )
 }
+
 
 # ================= PASSWORD VALIDATION =================
 AUTH_PASSWORD_VALIDATORS = [
@@ -134,8 +144,13 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = "smartcomputerins2022@gmail.com"
-EMAIL_HOST_PASSWORD = "higtfvoccvtwefff"   # Gmail App Password
+# Gmail App Password
+
+
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER   # 🔥 add this
 DEFAULT_FROM_EMAIL = "Smart Computer Institute (No Reply) <smartcomputerins2022@gmail.com>"
 EMAIL_TIMEOUT = 30  # Stop waiting after 10 seconds
@@ -150,9 +165,13 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ================= SECURITY =================
-SECRET_KEY = "django-insecure-change-this-secret-key"
-DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.29.249"]
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1"
+).split(",")
 
 # ================= INSTALLED APPS =================
 INSTALLED_APPS = [
