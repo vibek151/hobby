@@ -25,6 +25,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Check DATABASE_URL
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -c "import os; from urllib.parse import urlparse; u=os.environ.get('DATABASE_URL',''); print('DATABASE_URL exists:', bool(u)); print('Starts with:', u[:20]); print('Scheme:', urlparse(u).scheme)"
+
       - name: Run scheduler
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
