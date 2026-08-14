@@ -24,22 +24,46 @@ def send_email_otp(request):
 
         otp = ''.join(str(secrets.randbelow(10)) for _ in range(6))
 
-        send_mail(
-            "Email Verification OTP",
-            f"Your OTP is {otp}",
-            "smartcomputerins2022@gmail.com",
-            [email],
-            fail_silently=False
+        response = requests.post(
+            "https://api.mailjet.com/v3.1/send",
+            auth=(
+                os.environ["MAILJET_API_KEY"],
+                os.environ["MAILJET_SECRET_KEY"],
+            ),
+            json={
+                "Messages": [
+                    {
+                        "From": {
+                            "Email": "smartcomputerins2022@gmail.com",
+                            "Name": "Smart Computer Institute",
+                        },
+                        "To": [
+                            {
+                                "Email": email,
+                            }
+                        ],
+                        "Subject": "Email Verification OTP | Smart Computer Institute",
+                        "TextPart": (
+                            f"Dear User,\n\n"
+                            f"Your email verification OTP is: {otp}\n\n"
+                            f"This OTP is valid for 5 minutes.\n\n"
+                            f"Regards,\n"
+                            f"Smart Computer Institute"
+                        ),
+                    }
+                ]
+            },
+            timeout=30,
         )
 
-        # 🔥 overwrite old OTP (already correct)
-        request.session["email_otp"] = str(otp)
+        response.raise_for_status()
 
-        # ✅ ADD THIS (important)
+        request.session["email_otp"] = str(otp)
         request.session["email_otp_time"] = timezone.now().timestamp()
 
-        return JsonResponse({"status":"sent"})
+        return JsonResponse({"status": "sent"})
 
+    return JsonResponse({"status": "error"}, status=400)
 
 
 
