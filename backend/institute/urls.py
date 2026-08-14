@@ -5,7 +5,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
-
+from institute.forms import MailjetPasswordResetForm
 from student_portal.views import batchlistview, custom_logout
 # from institute.views import forgot_username, CustomAdminLoginView  # ✅ important
 from institute.views import forgot_username
@@ -13,7 +13,14 @@ from institute.views import forgot_username
 urlpatterns = [
 
     # 🔐 PASSWORD RESET (keep as is)
-    path("admin/password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
+    # path("admin/password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
+    path(
+        "admin/password_reset/",
+        auth_views.PasswordResetView.as_view(
+            form_class=MailjetPasswordResetForm
+        ),
+        name="password_reset",
+    ),
     path("admin/password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
@@ -43,6 +50,7 @@ urlpatterns = [
     path("student/", include("student_portal.urls")),
     path("api/website/", include("website_portal.urls")),
     path("api/management/", include("management_portal.urls")),
+
 ]
 
 

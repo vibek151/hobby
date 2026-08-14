@@ -5,7 +5,8 @@ from franchise.models import Franchise
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 
-
+import os
+import requests
 # ===============================
 # NORMAL VIEWS (UNCHANGED)
 # ===============================
@@ -34,11 +35,8 @@ def forgot_username(request):
 
     if request.method == "POST":
         email = request.POST.get("email")
-
-        # 1. Try normal Django User
         user = User.objects.filter(email=email).first()
 
-        # 2. If not found, try Franchise email
         if not user:
             franchise = Franchise.objects.filter(email=email).first()
 
@@ -46,6 +44,7 @@ def forgot_username(request):
                 user = franchise.user
 
         if user:
+
             html_content = f"""
             <!DOCTYPE html>
             <html>
@@ -140,14 +139,43 @@ def forgot_username(request):
             </html>
             """
 
-            send_mail(
-                subject="Account Username Recovery | Smart Computer Institute",
-                message=f"Dear User,\n\nWe received a request to recover the username for your Smart Computer Institute account.\n\nYour login username is: {user.username}\n\nIf you did not request this recovery, you can safely ignore this email.\n\nRegards,\nSmart Computer Institute Team",
-                from_email="smartcomputerins2022@gmail.com",
-                recipient_list=[email],
-                fail_silently=False,
-                html_message=html_content,
+            response = requests.post(
+                "https://api.mailjet.com/v3.1/send",
+                auth=(
+                    os.environ["MAILJET_API_KEY"],
+                    os.environ["MAILJET_SECRET_KEY"],
+                ),
+                json={
+                    "Messages": [
+                        {
+                            "From": {
+                                "Email": "smartcomputerins2022@gmail.com",
+                                "Name": "Smart Computer Institute",
+                            },
+                            "To": [
+                                {
+                                    "Email": email,
+                                }
+                            ],
+                            "Subject": "Account Username Recovery | Smart Computer Institute",
+                            "TextPart": (
+                                f"Dear User,\n\n"
+                                f"We received a request to recover the username for your "
+                                f"Smart Computer Institute account.\n\n"
+                                f"Your login username is: {user.username}\n\n"
+                                f"If you did not request this recovery, you can safely "
+                                f"ignore this email.\n\n"
+                                f"Regards,\n"
+                                f"Smart Computer Institute Team"
+                            ),
+                            "HTMLPart": html_content,
+                        }
+                    ]
+                },
+                timeout=30,
             )
+
+            response.raise_for_status()
 
             message = "Your username has been sent to your registered email address."
         else:

@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
 import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ================= BASE DIR =================
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,13 +14,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.29.249"]
 
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-local-development-key-change-this"
+)
 
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.environ.get("ALLOWED_HOSTS", "").split(",")
+    for host in os.environ.get(
+        "ALLOWED_HOSTS",
+        "127.0.0.1,localhost"
+    ).split(",")
     if host.strip()
 ]
 
@@ -84,9 +93,10 @@ WSGI_APPLICATION = "institute.wsgi.application"
 
 DATABASES = {
     "default": dj_database_url.parse(
-        os.environ["DATABASE_URL"]
+        os.environ.get("DATABASE_URL", "sqlite:///db.sqlite3")
     )
 }
+
 
 
 # ================= PASSWORD VALIDATION =================
