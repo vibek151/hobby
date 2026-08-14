@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.core.mail import send_mail
+from student_portal.notifications import send_student_email
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
 import random
 import secrets
+import requests
+import os
 from .models import Franchise
 from .utils import generate_temp_code, generate_otp
 from django.http import JsonResponse
@@ -120,13 +123,31 @@ def forgot_password(request):
                 {"error": "No email registered for this account."}
             )
 
-        send_mail(
-            "Password Recovery",
-            f"Your temporary login code: {code}\n\nThis code will expire in 10 minutes.",
-            "smartcomputerins2022@gmail.com",
-            [email],
-            fail_silently=False
+        response = requests.post(
+            "https://api.mailjet.com/v3.1/send",
+            auth=(
+                os.environ["MAILJET_API_KEY"],
+                os.environ["MAILJET_SECRET_KEY"]
+            ),
+            json={
+                "Messages": [{
+                    "From": {
+                        "Email": "smartcomputerins2022@gmail.com",
+                        "Name": "Smart Computer Institute"
+                    },
+                    "To": [
+                        {"Email": email}
+                    ],
+                    "Subject": "Password Recovery",
+                    "TextPart": (
+                        f"Your temporary login code: {code}\n\n"
+                        "This code will expire in 10 minutes."
+                    )
+                }]
+            }
         )
+
+        response.raise_for_status()
 
         return render(request, "forgot.html", {"success": "Code sent to your email."})
 

@@ -1,6 +1,7 @@
-from django.core.mail import EmailMessage
+import os
+import requests
+
 from django.template.loader import render_to_string
-from django.conf import settings
 
 
 def send_student_email(
@@ -11,34 +12,49 @@ def send_student_email(
     files=None,
     connection=None
 ):
-
-  
-
     html_content = render_to_string(
         template,
         context
     )
 
+    message = {
+        "From": {
+            "Email": "smartcomputerins2022@gmail.com",
+            "Name": "Smart Computer Institute"
+        },
+        "To": [
+            {
+                "Email": student.email
+            }
+        ],
+        "Subject": subject,
+        "HTMLPart": html_content
+    }
 
-    email = EmailMessage(
-        subject=subject,
-        body=html_content,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[student.email],
-        connection=connection
-    )
-
-    email.content_subtype = "html"
-
+    # Add PDF attachments if provided
     if files:
-        for file in files:
-            email.attach(
-                file[0],
-                file[1],
-                "application/pdf"
-            )
+        attachments = []
 
-    result = email.send(
-        fail_silently=False
+        for file in files:
+            attachments.append({
+                "ContentType": "application/pdf",
+                "Filename": file[0],
+                "Base64Content": file[1]
+            })
+
+        message["Attachments"] = attachments
+
+    response = requests.post(
+        "https://api.mailjet.com/v3.1/send",
+        auth=(
+            os.environ["MAILJET_API_KEY"],
+            os.environ["MAILJET_SECRET_KEY"]
+        ),
+        json={
+            "Messages": [message]
+        }
     )
 
+    response.raise_for_status()
+
+    return response.json()
