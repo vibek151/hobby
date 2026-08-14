@@ -5,6 +5,7 @@ django-simple-history
 reportlab
 xhtml2pdf
 django-cors-headers
+resend
 aiohappyeyeballs==2.6.1
 aiohttp==3.13.3
 aiosignal==1.4.0
