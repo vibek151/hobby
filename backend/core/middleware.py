@@ -33,6 +33,10 @@ class TenantMiddleware:
         _thread_locals.user = request.user
 
         if request.user.is_authenticated:
+
+            if request.user.is_superuser:
+                return self.get_response(request)
+
             from franchise.models import Franchise
 
             franchise = Franchise.objects.filter(user=request.user).first()
