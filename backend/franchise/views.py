@@ -417,13 +417,40 @@ def send_account_change_otp(request):
     request.session["account_change_otp"] = otp
     request.session["account_change_time"] = timezone.now().timestamp()
 
-    send_mail(
-        "Account Change Verification",
-        f"Your OTP is {otp}",
-        "smartcomputerins2022@gmail.com",
-        [email],
-        fail_silently=False
+    response = requests.post(
+        "https://api.mailjet.com/v3.1/send",
+        auth=(
+            os.environ["MAILJET_API_KEY"],
+            os.environ["MAILJET_SECRET_KEY"],
+        ),
+        json={
+            "Messages": [
+                {
+                    "From": {
+                        "Email": "smartcomputerins2022@gmail.com",
+                        "Name": "Smart Computer Institute",
+                    },
+                    "To": [
+                        {
+                            "Email": email,
+                        }
+                    ],
+                    "Subject": "Account Change Verification | Smart Computer Institute",
+                    "TextPart": (
+                        f"Dear User,\n\n"
+                        f"Your account verification OTP is: {otp}\n\n"
+                        f"This OTP is valid for 5 minutes.\n\n"
+                        f"If you did not request this, please ignore this email.\n\n"
+                        f"Regards,\n"
+                        f"Smart Computer Institute"
+                    ),
+                }
+            ]
+        },
+        timeout=30,
     )
+
+    response.raise_for_status()
 
     return JsonResponse({"status": "sent"})
 
