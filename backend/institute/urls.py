@@ -9,6 +9,9 @@ from institute.forms import MailjetPasswordResetForm
 from student_portal.views import batchlistview, custom_logout
 # from institute.views import forgot_username, CustomAdminLoginView  # ✅ important
 from institute.views import forgot_username
+from institute.views import health_check
+
+
 
 urlpatterns = [
 
@@ -50,6 +53,7 @@ urlpatterns = [
     path("student/", include("student_portal.urls")),
     path("api/website/", include("website_portal.urls")),
     path("api/management/", include("management_portal.urls")),
+    path("health/", health_check, name="health_check"),
 
 ]
 

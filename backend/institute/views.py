@@ -29,6 +29,11 @@ def pay(request):
 from django.core.mail import send_mail
 from django.shortcuts import render
 
+from django.http import HttpResponse
+
+def health_check(request):
+    return HttpResponse("OK")
+
 
 def forgot_username(request):
     message = ""
