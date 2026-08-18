@@ -107,6 +107,17 @@ class BatchTiming(MultiTenantModel):
 
 
 # ================= STUDENT ADMISSION =================
+
+
+
+def validate_passport_photo_size(value):
+    if value and value.size > 200 * 1024:  # 200 KB
+        raise ValidationError(
+            "Passport photo must be 200 KB or smaller."
+        )
+
+
+
 class StudentAdmission(MultiTenantModel):
 
     # 
@@ -173,7 +184,11 @@ class StudentAdmission(MultiTenantModel):
 
         return False
     
-    passport_photo = models.ImageField(upload_to="passport_photos/", null=True)
+    passport_photo = models.ImageField(
+        upload_to="passport_photos/",
+        null=True,
+        validators=[validate_passport_photo_size]
+    )
     guardian_name = models.CharField(max_length=100, null=True)
     dob = models.DateField(null=True)
     phone = models.CharField(max_length=10)
@@ -255,6 +270,7 @@ class StudentAdmission(MultiTenantModel):
                         "course":
                         "You cannot change the course directly. Please use Course Upgrade."
                     })
+
 
 
     def save(self, *args, **kwargs):
@@ -615,7 +631,7 @@ class Fee(MultiTenantModel):
     waive_fine = models.BooleanField(default=False)
     history = HistoricalRecords()
     # ================= SAVE =================
-    from django.core.exceptions import ValidationError
+    
     from dateutil.relativedelta import relativedelta
     from django.utils import timezone
     from django.db import transaction
