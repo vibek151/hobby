@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const discountAmt = adm * (disc / 100);
-        const finalVal = (adm - discountAmt) - adv;
+        const finalVal = (adm - discountAmt) + adv;
 
         if (durationInput) durationInput.value = currentDuration;
         if (monthlyInput) monthlyInput.value = currentMonthly.toFixed(2);

@@ -351,7 +351,7 @@ class StudentAdmission(MultiTenantModel):
         disc = Decimal(self.discount_percent or 0)
         adv = Decimal(self.advance_fees or 0)
         discount_value = (adm_amt * disc) / Decimal(100)
-        self.final_amount = adm_amt - discount_value - adv
+        self.final_amount = adm_amt - discount_value + adv
 
         # ✅ THIS IS THE FIX
         super().save(*args, **kwargs)
@@ -407,19 +407,70 @@ class StudentAdmission(MultiTenantModel):
             
             if self.admission_amount > 0 and self.receipt_no:
 
+                discounted_admission = (
+                Decimal(self.admission_amount or 0)
+                - (
+                    Decimal(self.admission_amount or 0)
+                    * Decimal(self.discount_percent or 0)
+                    / Decimal(100)
+                )
+            ).quantize(Decimal("0.01"))
+
+            admission_fee = Fee.objects.filter(
+                enrollment=enrollment,
+                receipt_no=self.receipt_no,
+                fee_type="ADMISSION",
+            ).first()
+
+            if admission_fee:
+                admission_fee.amount = discounted_admission
+                admission_fee.generated_fee = discounted_admission
+                admission_fee.pay_via = self.admission_pay_via or "CASH"
+                admission_fee.payment_date = (
+                    self.admission_date or timezone.now().date()
+                )
+                admission_fee.franchise = self.franchise
+
+                admission_fee.save(
+                    _allow_admission_update=True
+                )
+
+            else:
+                Fee.objects.create(
+                    enrollment=enrollment,
+                    receipt_no=self.receipt_no,
+                    fee_type="ADMISSION",
+                    amount=discounted_admission,
+                    generated_fee=discounted_admission,
+                    pay_via=self.admission_pay_via or "CASH",
+                    payment_date=self.admission_date or timezone.now().date(),
+                    franchise=self.franchise,
+                )
+
+            # =========================
+            # COURSE ADVANCE PAYMENT
+            # =========================
+            if self.advance_fees and self.advance_fees > 0:
+
                 Fee.objects.update_or_create(
                     receipt_no=self.receipt_no,
+                    fee_type="ADVANCE",
+                    enrollment=enrollment,
                     defaults={
-                        "enrollment": enrollment,
-                        "amount": self.admission_amount,
+                        "amount": self.advance_fees,
                         "pay_via": self.admission_pay_via or "CASH",
                         "payment_date": self.admission_date or timezone.now().date(),
                         "franchise": self.franchise,
-
-                        # only add this
-                        "generated_fee": self.admission_amount,
+                        "generated_fee": self.advance_fees,
+                        "generated_fine": 0,
+                        "fine": 0,
+                        "total_amount": self.advance_fees,
+                        "remaining_fee": 0,
+                        "remaining_fine": 0,
+                        "generated_total": self.advance_fees,
                     }
                 )
+
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -536,6 +587,7 @@ class Fee(MultiTenantModel):
     FEE_TYPE = [
         ("ADMISSION", "Admission"),
         ("MONTHLY", "Monthly"),
+        ("ADVANCE", "Advance"),
     ]
 
     fee_type = models.CharField(max_length=20, choices=FEE_TYPE, default="MONTHLY")
@@ -571,16 +623,29 @@ class Fee(MultiTenantModel):
     # from .utils import get_safe_date 
 
     def save(self, *args, **kwargs):
+        allow_admission_update = kwargs.pop(
+            "_allow_admission_update",
+            False
+        )
+
+        self._allow_admission_update = allow_admission_update
         with transaction.atomic():
             # 1. Detect Fee Type
             is_admission = (
-                self.enrollment.student.receipt_no 
+                self.fee_type != "ADVANCE"
+                and self.enrollment.student.receipt_no
                 and self.receipt_no == self.enrollment.student.receipt_no
             )
             if is_admission:
                 self.fee_type = "ADMISSION"
                 self.generated_fine = 0
                 self.due_date = None
+
+            elif self.fee_type == "ADVANCE":
+                self.fee_type = "ADVANCE"
+                self.generated_fine = 0
+                self.due_date = None
+
             else:
                 self.fee_type = "MONTHLY"
                 # Crucial: Ensures calc_date is available for new creations
@@ -869,8 +934,12 @@ class Fee(MultiTenantModel):
             old
             and old.fee_type == "ADMISSION"
             and old.amount != self.amount
+            and not getattr(
+                self,
+                "_allow_admission_update",
+                False
+            )
         ):
-
             raise ValidationError(
                 "Admission fee cannot be modified."
             )
@@ -916,40 +985,34 @@ class Fee(MultiTenantModel):
         # Course total fee limit
         # ==========================
 
-        if not self.pk and (self.amount or 0) > 0:
+        if (
+            self.fee_type == "MONTHLY"
+            and (self.amount or 0) > 0
+        ):
 
             paid_total = (
-
                 Fee.objects.filter(
                     enrollment=self.enrollment,
-                    fee_type="MONTHLY"
+                    fee_type__in=["MONTHLY", "ADVANCE"]
                 )
-
                 .exclude(pk=self.pk)
-
                 .aggregate(
                     total=models.Sum("amount")
                 )["total"]
-
                 or 0
             )
 
             remaining_course_fee = max(
-
                 0,
-
                 float(self.enrollment.total_fee)
                 - float(paid_total)
-
             )
 
             if float(self.amount) > remaining_course_fee:
 
                 raise ValidationError({
-
                     "amount":
-                    f"You can pay maximum ₹{remaining_course_fee}"
-
+                    f"You can pay maximum ₹{remaining_course_fee:.2f}"
                 })
 
         # ==========================

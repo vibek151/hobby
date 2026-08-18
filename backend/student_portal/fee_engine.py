@@ -171,7 +171,7 @@ def calculate_student_dues(
             + (payment_date.month - first_payable_month.month)
         ) + 1
 
-        total_paid = (
+        monthly_paid = (
             Fee._base_manager
             .filter(
                 enrollment=enrollment,
@@ -182,7 +182,7 @@ def calculate_student_dues(
         )
 
         cleared_months = int(
-            total_paid // enrollment.monthly_fee
+            monthly_paid // enrollment.monthly_fee
         )
 
         pending_months = max(
@@ -217,11 +217,11 @@ def calculate_student_dues(
     # COURSE LIMIT
     # =====================
 
-    total_paid = (
+    total_course_paid = (
         Fee._base_manager
         .filter(
             enrollment=enrollment,
-            fee_type="MONTHLY"
+            fee_type__in=["MONTHLY", "ADVANCE"]
         )
         .aggregate(total=Sum("amount"))["total"]
         or 0
@@ -229,7 +229,7 @@ def calculate_student_dues(
 
     remaining_course_fee = max(
         0,
-        enrollment.total_fee - total_paid
+        enrollment.total_fee - total_course_paid
     )
     # =====================================
     # ACTIVE MONTHLY DUES

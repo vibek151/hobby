@@ -1367,7 +1367,7 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
             adv_fees = float(obj.advance_fees or 0)
 
             after_discount = adm_amt - (adm_amt * (disc_percent / 100))
-            obj.final_amount = after_discount - adv_fees
+            obj.final_amount = after_discount + adv_fees
 
         # 🔥 If upgrade, force new object BEFORE save
         if is_upgrade:
@@ -2503,7 +2503,8 @@ class PaymentHistoryAdmin(FranchiseAdmin):
 
         total = (
             Fee.objects
-            .filter(enrollment=enrollment, fee_type="MONTHLY")
+            .filter(enrollment=enrollment)
+            .exclude(fee_type="ADMISSION")
             .aggregate(total=Sum("amount"))
         )["total"] or 0
 
@@ -2529,7 +2530,8 @@ class PaymentHistoryAdmin(FranchiseAdmin):
 
         total_paid = (
             Fee.objects
-            .filter(enrollment=enrollment, fee_type="MONTHLY")
+            .filter(enrollment=enrollment)
+            .exclude(fee_type="ADMISSION")
             .aggregate(total=Sum("amount"))
         )["total"] or 0
 
