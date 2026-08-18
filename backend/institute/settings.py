@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
+import cloudinary
 
 load_dotenv()
 
@@ -13,6 +14,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.29.249"]
 
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+)
 
 SECRET_KEY = os.environ.get(
     "SECRET_KEY",
@@ -46,6 +52,8 @@ INSTALLED_APPS = [
     "website_portal.apps.WebsitePortalConfig",
     'simple_history',
     'corsheaders',
+    "cloudinary",
+    "cloudinary_storage",
 ]
 STATIC_URL = '/static/'
 # ================= MIDDLEWARE =================
@@ -124,14 +132,25 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "django.core.files.storage.FileSystemStorage",
+#     },
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+#     },
+# }
+
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+
 # ================= MEDIA FILES =================
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"

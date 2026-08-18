@@ -65,7 +65,7 @@ admin.site.unregister(User)
 admin.site.unregister(Group)
 from .models import BatchDay
 from reportlab.pdfbase.pdfmetrics import stringWidth
-
+from reportlab.lib.utils import ImageReader
 def draw_wrapped_text(p, text, x, y, max_width, line_height=14):
     words = text.split()
     line = ""
@@ -1211,7 +1211,17 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
             if student.passport_photo:
                 try:
                     p.rect(width - 155, height - 240, 100, 120)
-                    p.drawImage(student.passport_photo.path, width - 155, height - 240, width=100, height=120)
+                    with student.passport_photo.open("rb") as photo_file:
+                        p.drawImage(
+                            ImageReader(photo_file),
+                            width - 155,
+                            height - 240,
+                            width=100,
+                            height=120,
+                            preserveAspectRatio=True,
+                            anchor="c",
+                            mask="auto",
+                        )
                 except: pass
             
             y = height-145
@@ -1288,37 +1298,28 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
             for rule in rules: p.drawString(50, y, rule); y -= 15
 
 
-            signature_path = None
-
             franchise = getattr(student, "franchise", None)
 
             if franchise and franchise.signature:
                 try:
-                    signature_path = franchise.signature.path
-                except:
-                    signature_path = None
-
-            if signature_path and os.path.exists(signature_path):
-                try:
-                    # Fixed signature size
                     signature_width = 150
                     signature_height = 50
 
-                    # Position
                     signature_x = width - 190
                     signature_y = 65
 
-                    p.drawImage(
-                        signature_path,
-                        signature_x,
-                        signature_y,
-                        width=signature_width,
-                        height=signature_height,
-                        mask='auto'
-                    )
+                    with franchise.signature.open("rb") as signature_file:
+                        p.drawImage(
+                            ImageReader(signature_file),
+                            signature_x,
+                            signature_y,
+                            width=signature_width,
+                            height=signature_height,
+                            mask="auto",
+                        )
 
                 except Exception as e:
-                    print("Signature draw error:", e)
+                    print("Signature draw error:", repr(e))
 
 
             # Signature & Footer

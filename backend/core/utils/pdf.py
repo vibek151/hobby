@@ -5,9 +5,9 @@ import os
 from django.conf import settings
 from datetime import datetime
 from PIL import Image
-
+from reportlab.lib.utils import ImageReader
 from student_portal.models import StudentAdmission, Certificate
-
+import requests
 
 # 🔥 KEEP YOUR EXISTING HELPER (must already exist in your project)
 def draw_wrapped_text(p, text, x, y, max_width):
@@ -71,17 +71,44 @@ def generate_admission_pdf(student):
         )
         p.restoreState()
 
+    # DEBUG — PHOTO
+    print("PHOTO:", student.passport_photo)
+    print(
+        "PHOTO URL:",
+        student.passport_photo.url if student.passport_photo else "NONE"
+    )
+
+    # DEBUG — SIGNATURE
+    franchise = getattr(student, "franchise", None)
+
+    # print("FRANCHISE:", franchise)
+    # print(
+    #     "SIGNATURE:",
+    #     franchise.signature if franchise and franchise.signature else "NONE"
+    # )
+    # print(
+    #     "SIGNATURE URL:",
+    #     franchise.signature.url
+    #     if franchise and franchise.signature
+    #     else "NONE"
+    # )
+
     # Passport Photo
     if student.passport_photo:
         try:
             p.rect(width - 155, height - 240, 100, 120)
-            p.drawImage(
-                student.passport_photo.path,
-                width - 155,
-                height - 240,
-                width=100,
-                height=120
-            )
+
+            with student.passport_photo.open("rb") as photo_file:
+                p.drawImage(
+                    ImageReader(photo_file),
+                    width - 155,
+                    height - 240,
+                    width=100,
+                    height=120,
+                    preserveAspectRatio=True,
+                    anchor="c",
+                )
+
         except Exception as e:
             print("Passport photo error:", e)
 
@@ -209,34 +236,44 @@ def generate_admission_pdf(student):
         y -= 15
 
     # SIGNATURE
-    signature_path = None
     franchise = getattr(student, "franchise", None)
 
     if franchise and franchise.signature:
         try:
-            signature_path = franchise.signature.path
-        except:
-            signature_path = None
+            signature_url = franchise.signature.url
 
-    if signature_path and os.path.exists(signature_path):
-        try:
-            signature_width = 150
-            signature_height = 50
+            print("SIGNATURE URL:", signature_url)
 
-            signature_x = width - 190
-            signature_y = 65
+            response = requests.get(signature_url, timeout=15)
+            response.raise_for_status()
+
+            signature_image = Image.open(BytesIO(response.content))
+            signature_image.load()
+
+            if signature_image.mode not in ("RGB", "RGBA"):
+                signature_image = signature_image.convert("RGBA")
+
+            signature_buffer = BytesIO()
+            signature_image.save(signature_buffer, format="PNG")
+            signature_buffer.seek(0)
 
             p.drawImage(
-                signature_path,
-                signature_x,
-                signature_y,
-                width=signature_width,
-                height=signature_height,
+                ImageReader(signature_buffer),
+                width - 190,
+                65,
+                width=150,
+                height=50,
                 mask="auto",
+                preserveAspectRatio=True,
+                anchor="c",
             )
 
+            print("✅ Signature drawn successfully")
+
         except Exception as e:
-            print("Signature draw error:", e)
+            print("❌ Signature draw error:", repr(e))
+    else:
+        print("❌ No franchise signature found")
 
     # FOOTER
     p.line(width - 200, 65, width - 50, 65)
