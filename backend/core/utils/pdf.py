@@ -82,8 +82,8 @@ def generate_admission_pdf(student):
                 width=100,
                 height=120
             )
-        except:
-            pass
+        except Exception as e:
+            print("Passport photo error:", e)
 
     y = height-145
 
