@@ -37,4 +37,5 @@ def send_email_async(subject, message, recipient_list, html_message=None, files=
         except Exception as e:
             print("❌ Email Error:", e)
 
-    threading.Thread(target=send, daemon=True).start()
+    # threading.Thread(target=send, daemon=True).start()
+    send()
