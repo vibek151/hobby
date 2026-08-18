@@ -8,6 +8,8 @@ def send_email_async(subject, message, recipient_list, html_message=None, files=
     def send():
         try:
             time.sleep(1.5)
+            print("SMTP USER:", settings.EMAIL_HOST_USER)
+            print("SMTP PASSWORD SET:", bool(settings.EMAIL_HOST_PASSWORD))
             msg = EmailMultiAlternatives(
                 subject,
                 message,
@@ -35,4 +37,4 @@ def send_email_async(subject, message, recipient_list, html_message=None, files=
         except Exception as e:
             print("❌ Email Error:", e)
 
-    threading.Thread(target=send, daemon=True).start()
+    send()
