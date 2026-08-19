@@ -208,3 +208,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://smartci.in",
+    "https://www.smartci.in",
+]
