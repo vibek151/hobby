@@ -16,11 +16,9 @@ class MailjetPasswordResetForm(PasswordResetForm):
         html_email_template_name=None,
     ):
         from django.template.loader import render_to_string
-
-        subject = render_to_string(
-            subject_template_name,
-            context
-        ).strip()
+        context["domain"] = "smartci.in"
+        context["protocol"] = "https"
+        subject = "Password Reset | Smart Computer Institute"
 
         text_content = render_to_string(
             email_template_name,
