@@ -278,7 +278,7 @@ def send_new_email_otp(request):
             send_mail(
                 "Verify New Email",
                 f"Your verification code for your new email is {otp}",
-                "smartcomputerins2022@gmail.com",
+                "settings.DEFAULT_FROM_EMAIL",
                 [email],
                 fail_silently=True
             )
@@ -385,7 +385,7 @@ def update_email(request):
         send_mail(
             "Email Updated Successfully",
             "Your new email is now active for your account.",
-            "smartcomputerins2022@gmail.com",
+            "settings.DEFAULT_FROM_EMAIL",
             [new_email],
             fail_silently=True
         )

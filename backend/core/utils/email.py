@@ -73,7 +73,7 @@ def send_email_async(
 
             message_data = {
                 "From": {
-                    "Email": "smartcomputerins2022@gmail.com",
+                    "Email": "settings.DEFAULT_FROM_EMAIL",
                     "Name": "Smart Computer Institute"
                 },
                 "To": [

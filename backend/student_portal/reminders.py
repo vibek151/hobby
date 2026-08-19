@@ -169,7 +169,7 @@ Smart Computer Institute
             email = EmailMultiAlternatives(
                 f"Fee Reminder - {student_code}",
                 "",
-                "smartcomputerins2022@gmail.com",
+                "settings.DEFAULT_FROM_EMAIL",
                 [student.email]
             )
 
@@ -255,7 +255,7 @@ Smart Computer Institute
             email = EmailMultiAlternatives(
                 f"Late Fee Notice - {student_code}",
                 "",
-                "smartcomputerins2022@gmail.com",
+                "settings.DEFAULT_FROM_EMAIL",
                 [student.email]
             )
 

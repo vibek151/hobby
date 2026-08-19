@@ -176,7 +176,7 @@ def send_fee_email(student, instance):
     
 
     subject = "Payment Receipt"
-    from_email = "smartcomputerins2022@gmail.com"
+    from_email=settings.DEFAULT_FROM_EMAIL
     to = [student.email]
 
     # ✅ FIX 1: Use correct field

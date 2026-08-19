@@ -19,7 +19,7 @@ def send_student_email(
 
     message = {
         "From": {
-            "Email": "smartcomputerins2022@gmail.com",
+            "Email": "settings.DEFAULT_FROM_EMAIL",
             "Name": "Smart Computer Institute"
         },
         "To": [
