@@ -1,120 +1,19 @@
-{% extends "admin/base_site.html" %}
-
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">Home</a>
-    &rsaquo; Forgot Username
-</div>
-{% endblock %}
-
-{% block extrastyle %}
-{{ block.super }}
-<style>
-    #content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 80vh;
-    }
-
-    .card {
-        background: #ffffff !important; /* Force white card */
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 420px;
-    }
-
-    /* Force text to stay dark on the white card */
-    .card h2, .card label {
-        color: #1e293b !important;
-        text-align: center;
-    }
-
-    .form-group {
-        margin-bottom: 15px;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: 500;
-        text-align: left; /* Keep label left-aligned */
-    }
-
-    /* 🔥 THE DARK MODE INPUT FIX */
-    input[type="email"] {
-        width: 100% !important;
-        padding: 12px !important;
-        border: 1px solid #94a3b8 !important;
-        border-radius: 5px !important;
-        box-sizing: border-box !important;
-        
-        /* Force blue-grey background and dark navy text */
-        background-color: #b1bccd !important; 
-        color: #0f172a !important;
-        font-weight: 600 !important;
-        
-        /* Prevent browser from forcing white text in dark mode */
-        -webkit-text-fill-color: #0f172a !important;
-    }
-
-    /* 🔥 THE FOCUS FIX (CLICK STATE) */
-    input[type="email"]:focus {
-        background-color: #b1bccd !important; /* Stays blue-grey */
-        color: #0f172a !important;            /* Stays dark navy */
-        border: 1px solid #0f172a !important; 
-        outline: none !important;
-        box-shadow: none !important;           /* Kills default blue glow */
-        -webkit-text-fill-color: #0f172a !important;
-    }
-
-    button {
-        width: 100%;
-        padding: 12px;
-        background: #1c84ee;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        margin-top: 10px;
-        cursor: pointer;
-        transition: 0.3s;
-        box-sizing: border-box;
-    }
-
-    button:hover {
-        background: #1669bd;
-    }
-</style>
-{% endblock %}
-
-{% block content_title %}{% endblock %}
-
-{% block content %}
-<div class="card">
-
-    <h2>Forgot Username</h2>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Forgot Username</title>
+</head>
+<body>
+    <h1>Forgot Username</h1>
 
     <form method="post">
         {% csrf_token %}
-
-        <div class="form-group">
-            <label>Email:</label>
-            <input type="email" name="email" required>
-        </div>
-
+        <input type="email" name="email" required>
         <button type="submit">Get Username</button>
     </form>
 
-</div>
-
-{% if message %}
-<script>
-    alert("{{ message|escapejs }}");
-    window.location.href = "/admin/login/";
-</script>
-{% endif %}
-
-{% endblock %}
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+</body>
+</html>
