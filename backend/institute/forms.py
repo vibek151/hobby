@@ -37,7 +37,7 @@ class MailjetPasswordResetForm(PasswordResetForm):
 
         message = {
             "From": {
-                "Email": "smartcomputerins2022@gmail.com",
+                "Email": "noreply@smartci.in",
                 "Name": "Smart Computer Institute",
             },
             "To": [
