@@ -223,3 +223,6 @@
 from django.http import HttpResponse
 def forgot_username(request):
     return HttpResponse("FORGOT USERNAME VIEW IS WORKING")
+
+def health_check(request):
+    return HttpResponse("OK")
