@@ -36,6 +36,16 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "CSRF_TRUSTED_ORIGINS",
+        ""
+    ).split(",")
+    if origin.strip()
+]
+
 # ================= INSTALLED APPS =================
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -213,3 +223,20 @@ CSRF_TRUSTED_ORIGINS = [
     "https://smartci.in",
     "https://www.smartci.in",
 ]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}
