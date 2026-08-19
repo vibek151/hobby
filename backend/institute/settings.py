@@ -164,23 +164,41 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886"   # NO COMMA
 
 # ================= EMAIL (FOR OTP) =================
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+
+# # Gmail App Password
+
+
+# EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+
+# # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER   # 🔥 add this
+# DEFAULT_FROM_EMAIL = "Smart Computer Institute (No Reply) <smartcomputerins2022@gmail.com>"
+# EMAIL_TIMEOUT = 30  # Stop waiting after 10 seconds
+# EMAIL_USE_SSL = False # Use TLS (already set to True)
+
+# ================= EMAIL (MAILJET SMTP) =================
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
+
+EMAIL_HOST = "in-v3.mailjet.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 
-# Gmail App Password
+EMAIL_HOST_USER = os.environ.get("MAILJET_API_KEY")
+EMAIL_HOST_PASSWORD = os.environ.get("MAILJET_SECRET_KEY")
+
+DEFAULT_FROM_EMAIL = "Smart Computer Institute (No Reply) <noreply@smartci.in>"
+
+EMAIL_TIMEOUT = 30
 
 
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
-
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER   # 🔥 add this
-DEFAULT_FROM_EMAIL = "Smart Computer Institute (No Reply) <smartcomputerins2022@gmail.com>"
-EMAIL_TIMEOUT = 30  # Stop waiting after 10 seconds
-EMAIL_USE_SSL = False # Use TLS (already set to True)
 
 # ================= LOGIN SETTINGS =================
 LOGIN_URL = '/admin/login/'
