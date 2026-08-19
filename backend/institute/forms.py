@@ -63,3 +63,8 @@ class MailjetPasswordResetForm(PasswordResetForm):
         )
 
         response.raise_for_status()
+
+    def save(self, *args, **kwargs):
+        kwargs["email_template_name"] = "registration/password_reset_email.txt"
+        kwargs["html_email_template_name"] = "registration/password_reset_email.html"
+        return super().save(*args, **kwargs)
