@@ -154,7 +154,7 @@ def forgot_username(request):
                     "Messages": [
                         {
                             "From": {
-                                "Email": "smartcomputerins2022@gmail.com",
+                                "Email": "noreply@smartci.in",
                                 "Name": "Smart Computer Institute",
                             },
                             "To": [
