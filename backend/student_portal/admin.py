@@ -1834,10 +1834,10 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
             student = obj.enrollment.student
 
             # 🚫 Block admission delete
-            if obj.fee_type == "ADMISSION":
+            if obj.fee_type in ("ADMISSION", "ADVANCE"):
                 self.message_user(
                     request,
-                    "⚠️ Admission fee is restricted. To remove it, delete the Student Admission instead.",
+                    "⚠️ Admission/Advance fee is locked. Change it from Student Admission.",
                     level=messages.ERROR
                 )
                 return
@@ -1890,10 +1890,10 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
 
         student = obj.enrollment.student
 
-        if obj.fee_type == "ADMISSION":
+        if obj.fee_type in ("ADMISSION", "ADVANCE"):
             messages.error(
                 request,
-                "⚠️ Admission fee is restricted. To remove it, delete the Student Admission instead."
+                "⚠️ Admission/Advance fee is locked. Change it from Student Admission."
             )
             return
 
@@ -1924,10 +1924,10 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
             student = obj.enrollment.student
 
             # 🚫 Admission block
-            if obj.fee_type == "ADMISSION":
+            if obj.fee_type in ("ADMISSION", "ADVANCE"):
                 messages.error(
                     request,
-                    "⚠️ Admission fee is restricted. To remove it, delete the Student Admission instead."
+                    "⚠️ Admission/Advance fee is locked. Change it from Student Admission."
                 )
                 blocked = True
 
