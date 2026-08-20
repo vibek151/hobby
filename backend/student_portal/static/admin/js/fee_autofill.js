@@ -45,8 +45,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     amountField.value = parseFloat(data.monthly_fee || 0).toFixed(2);
                 }
 
-                if (data.next_due_date) {
-                    dueField.value = data.next_due_date;
+                // if (data.next_due_date) {
+                //     dueField.value = data.next_due_date;
+                // }
+
+                if (data.due_date) {
+                    dueField.value = data.due_date;
                 }
 
                 console.log("RUNNING BACKEND FEE API");
