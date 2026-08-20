@@ -73,11 +73,13 @@ window.addEventListener("load", function () {
     }
 
     // Listen for changes on Time dropdown
-    classTime.addEventListener("change", function () {
-        if (selectedDays.options.length > 0) {
-            checkCapacity();
-        }
-    });
+    if (classTime) {
+        classTime.addEventListener("change", function () {
+            if (selectedDays.options.length > 0) {
+                checkCapacity();
+            }
+        });
+    }
 
     // Handle both standard selection and common UI click movements
     selectedDays.addEventListener("change", checkCapacity);
