@@ -115,6 +115,20 @@ DATABASES = {
     )
 }
 
+if os.environ.get("REDIS_URL"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": os.environ.get("REDIS_URL"),
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "smartci-local-cache",
+        }
+    }
 
 
 # ================= PASSWORD VALIDATION =================

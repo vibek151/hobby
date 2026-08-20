@@ -12,7 +12,8 @@ import requests
 import os
 from .models import Franchise
 from .utils import generate_temp_code, generate_otp
-from django.http import JsonResponse
+from django.core.cache import cache
+
 
 
 
@@ -507,20 +508,48 @@ def logout_restricted(request):
     request.session.flush()
     return redirect("/admin/login/")
 
-from django.http import JsonResponse
 
 
 def check_restriction(request):
+
     # If user session died, tell JS to stop
     if not request.user.is_authenticated:
-        return JsonResponse({"restricted": True, "auth": False}, status=401)
-        
-    from franchise.models import Franchise
-    franchise = Franchise.objects.filter(user=request.user).first()
+        return JsonResponse(
+            {"restricted": True, "auth": False},
+            status=401
+        )
+
+    cache_key = f"franchise_restricted_{request.user.id}"
+
+    # Try cache first
+    restricted = cache.get(cache_key)
     
+
+    if restricted is None:
+        from franchise.models import Franchise
+
+        franchise = Franchise.objects.filter(
+            user=request.user
+        ).first()
+
+        restricted = (
+            franchise.is_restricted
+            if franchise
+            else False
+        )
+
+        # Cache for 5 seconds
+        cache.set(
+            cache_key,
+            restricted,
+            5
+        )
+
     return JsonResponse({
-        "restricted": franchise.is_restricted if franchise else False
+        "restricted": restricted
     })
+
+
 from django.contrib.auth.decorators import login_required
 
 @login_required
