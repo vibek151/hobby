@@ -3,7 +3,10 @@ window.addEventListener("load", function () {
     const classTime = document.getElementById("id_class_time");
     const selectedDays = document.getElementById("id_class_day_to");
     const availableDays = document.getElementById("id_class_day_from");
-
+    // This script is only needed on the Student Admission form
+    if (!classTime || !selectedDays || !availableDays) {
+        return;
+    }
     function showError(msg) {
         let error = document.getElementById("batch-capacity-error");
         if (!error) {
@@ -73,16 +76,19 @@ window.addEventListener("load", function () {
     }
 
     // Listen for changes on Time dropdown
-    if (classTime) {
-        classTime.addEventListener("change", function () {
-            if (selectedDays.options.length > 0) {
-                checkCapacity();
-            }
-        });
-    }
+    // if (classTime) {
+    classTime.addEventListener("change", function () {
+        if (selectedDays.options.length > 0) {
+            checkCapacity();
+        }
+    });
+    // }
 
+    
     // Handle both standard selection and common UI click movements
+    // if (selectedDays) {
     selectedDays.addEventListener("change", checkCapacity);
+    // }
     
     // Safety check for Django's filter widgets: intercepting UI movements
     document.addEventListener("click", function (e) {
