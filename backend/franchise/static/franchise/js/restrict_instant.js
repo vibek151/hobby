@@ -26,7 +26,7 @@
                 row.style.opacity = '0.4'; 
 
                 // Use a relative path to ensure it hits the ModelAdmin-defined URL
-                fetch(`ajax-toggle-restriction/${pk}/`, {
+                fetch(`/admin/franchise/franchise/ajax-toggle-restriction/${pk}/`, {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': csrftoken,

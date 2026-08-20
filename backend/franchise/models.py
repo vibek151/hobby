@@ -2,8 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-
+import os
+from django.core.cache import cache
 
 class Franchise(models.Model):
     # Link to the User account for login
@@ -87,7 +87,8 @@ class Franchise(models.Model):
             self.manager_name = self.manager_name.strip().title()
         
         super(Franchise, self).save(*args, **kwargs)
-
+        if self.user_id:
+            cache.delete(f"franchise_restricted_{self.user_id}")
         # ================= SIGNATURE RESIZE =================
         if self.signature:
             try:

@@ -509,10 +509,8 @@ def logout_restricted(request):
     return redirect("/admin/login/")
 
 
-
 def check_restriction(request):
 
-    # If user session died, tell JS to stop
     if not request.user.is_authenticated:
         return JsonResponse(
             {"restricted": True, "auth": False},
@@ -521,9 +519,7 @@ def check_restriction(request):
 
     cache_key = f"franchise_restricted_{request.user.id}"
 
-    # Try cache first
     restricted = cache.get(cache_key)
-    
 
     if restricted is None:
         from franchise.models import Franchise
@@ -538,17 +534,11 @@ def check_restriction(request):
             else False
         )
 
-        # Cache for 5 seconds
-        cache.set(
-            cache_key,
-            restricted,
-            5
-        )
+        cache.set(cache_key, restricted, 60)
 
     return JsonResponse({
         "restricted": restricted
     })
-
 
 from django.contrib.auth.decorators import login_required
 

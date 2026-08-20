@@ -45,6 +45,8 @@ class TenantMiddleware:
             # ===============================
             # 🔒 RESTRICTION LOGIC
             # ===============================
+            if request.path == "/franchise/check-restriction/":
+                return self.get_response(request)
             if franchise and franchise.is_restricted:
 
                 try:
