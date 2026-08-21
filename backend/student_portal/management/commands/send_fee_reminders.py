@@ -204,7 +204,7 @@ SCI
                     font-weight:700;
                     letter-spacing:1px;
                 ">
-                    SCI
+                    Smart Computer Institute
                 </p>
 
             </div>
