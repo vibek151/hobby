@@ -5,11 +5,14 @@ from django.db.models.signals import post_save, post_delete, pre_save
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 import threading
-
+from django.core.mail import get_connection
 from core.utils.email import send_email_async
 from core.utils.pdf import generate_admission_pdf
 from email.mime.image import MIMEImage
 from core.utils.email_tasks import send_certificate_email_async
+import os
+import requests
+
 # -------------------------------
 # COURSE COMPLETION LOGIC
 # -------------------------------
@@ -282,11 +285,40 @@ def send_fee_email(student, instance):
     </body>
     </html>
     """
+    
 
+    response = requests.post(
+        "https://api.mailjet.com/v3.1/send",
+        auth=(
+            os.environ["MAILJET_API_KEY"],
+            os.environ["MAILJET_SECRET_KEY"]
+        ),
+        json={
+            "Messages": [
+                {
+                    "From": {
+                        "Email": "noreply@smartci.in",
+                        "Name": "Smart Computer Institute"
+                    },
+                    "To": [
+                        {
+                            "Email": student.email,
+                            "Name": student.name
+                        }
+                    ],
+                    "Subject": subject,
+                    "TextPart": text_content,
+                    "HTMLPart": html_content,
+                }
+            ]
+        },
+        timeout=30,
+    )
 
-    msg = EmailMultiAlternatives(subject, text_content, from_email, to)
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
+    print("MAILJET STATUS:", response.status_code)
+    print("MAILJET RESPONSE:", response.text)
+
+    response.raise_for_status()
 
 
 
