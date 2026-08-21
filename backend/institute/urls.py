@@ -10,8 +10,8 @@ from student_portal.views import batchlistview, custom_logout
 # from institute.views import forgot_username, CustomAdminLoginView  # ✅ important
 from institute.views import forgot_username
 from institute.views import health_check
-
-
+from django.urls import path, include
+from student_portal.views import fee_reminder_cron
 
 urlpatterns = [
 
@@ -54,6 +54,10 @@ urlpatterns = [
     path("api/website/", include("website_portal.urls")),
     path("api/management/", include("management_portal.urls")),
     path("health/", health_check, name="health_check"),
+    path(
+        "fee-reminder-trigger/",
+        fee_reminder_cron,
+    ),
 
 ]
 

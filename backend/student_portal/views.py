@@ -1585,3 +1585,32 @@ def verify_certificate(request):
             "valid": False
         })
 
+
+import os
+from django.http import JsonResponse
+from django.core.management import call_command
+
+
+def fee_reminder_cron(request):
+
+    token = request.GET.get("token")
+
+    if token != os.environ.get("FEE_CRON_SECRET"):
+        return JsonResponse(
+            {"error": "Unauthorized"},
+            status=401
+        )
+
+    try:
+        call_command("send_fee_reminders")
+
+        return JsonResponse({
+            "success": True,
+            "message": "Fee reminder job completed"
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": str(e)
+        }, status=500)
