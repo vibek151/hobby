@@ -1,0 +1,137 @@
+[
+{
+  "model": "website_portal.websitecourse",
+  "pk": 3,
+  "fields": {
+    "code": "DCOA",
+    "name": "Digital Computing & Office Applications",
+    "order": 1,
+    "course_image": "",
+    "duration": 6,
+    "admission_fee": "1000.00",
+    "monthly_fee": "250.00",
+    "show_on_homepage": false,
+    "syllabus": "Paint, Notepad, WordPad \r\n\r\nComputer Application \r\n\r\n    Microsoft Word 2007, 2013\r\n\r\n    Microsoft Excel 2007,2013\r\n\r\n    Microsoft PowerPoint 2007,2013\r\n\r\n    Microsoft access 2007, 2013\r\n\r\nInternet \r\n\r\n    Email ID Creation\r\n\r\n    Mailing \r\n\r\n    Mail Compose \r\n\r\n    CC, BCC \r\n\r\nTyping Test \r\n\r\n   Speed Increase\r\n\r\n   Typing Method",
+    "exams": [
+      2,
+      3,
+      4
+    ]
+  }
+},
+{
+  "model": "website_portal.websitecourse",
+  "pk": 4,
+  "fields": {
+    "code": "ADCOA",
+    "name": "Advance Diploma in Computing & Office Applications",
+    "order": 2,
+    "course_image": "",
+    "duration": 12,
+    "admission_fee": "1000.00",
+    "monthly_fee": "350.00",
+    "show_on_homepage": false,
+    "syllabus": "Paint, Notepad, WordPad \r\n\r\nOffice Application \r\n\r\n Microsoft Word 2007, 2013\r\n Microsoft Excel 2007,2013\r\n Microsoft PowerPoint 2007,2013\r\n Microsoft access 2007, 2013\r\nAdvance Excel\r\nGoogle Sheet\r\nGoogle Forms\r\nGoogle Sites\r\nInternet \r\n Email ID Creation\r\n Mailing \r\n Mail Compose \r\n CC, BCC \r\nTyping Test \r\n Speed Increase\r\n Typing Method",
+    "exams": [
+      2,
+      3,
+      4
+    ]
+  }
+},
+{
+  "model": "website_portal.websitecourse",
+  "pk": 5,
+  "fields": {
+    "code": "AFAG",
+    "name": "Advance Financial Accounting & GST",
+    "order": 3,
+    "course_image": "",
+    "duration": 8,
+    "admission_fee": "1000.00",
+    "monthly_fee": "450.00",
+    "show_on_homepage": false,
+    "syllabus": "Accounts\r\n\r\n   Journal\r\n\r\n   Ledger\r\n\r\nTally Prime\r\n\r\n   Company Creation\r\n\r\n   Ledger Entry\r\n\r\n   Contra, payment, receipt, journal (transactions)\r\n\r\n   Cost center\r\n\r\n   Cost Category\r\n\r\n   Maintain Godown\r\n\r\n   Purchase & Sale\r\n\r\n   GST & Double GST\r\n\r\n   Price Level\r\n\r\n   BOM\r\n\r\n   TDS\r\n\r\n   Budget\r\n\r\n   Job Costing\r\n\r\n   Payroll\r\n\r\nBanking tally\r\n\r\n   Audit Feature\r\n\r\n   BRS\r\n\r\n   Import & Export\r\n\r\n   POS\r\n\r\n   Purchase Order &   Sales Order\r\n\r\n   Purchase Return & Sales Return\r\n\r\n   Interest Calculation.\r\n\r\n   E-Way Bill\r\n\r\n   Tax Invoice, Logo",
+    "exams": [
+      6,
+      7
+    ]
+  }
+},
+{
+  "model": "website_portal.websitecourse",
+  "pk": 6,
+  "fields": {
+    "code": "DAFAG",
+    "name": "Diploma in Advance Financial Accounting & GST",
+    "order": 4,
+    "course_image": "",
+    "duration": 12,
+    "admission_fee": "1000.00",
+    "monthly_fee": "450.00",
+    "show_on_homepage": false,
+    "syllabus": "Paint, Notepad, WordPad \r\n\r\nComputer Application \r\n\r\n    Microsoft Word 2007, 2013\r\n\r\n    Microsoft Excel 2007,2013\r\n\r\n    Microsoft PowerPoint 2007,2013\r\n\r\n    Microsoft access 2007, 2013\r\n\r\nInternet \r\n\r\n    Email ID Creation\r\n\r\n    Mailing \r\n\r\n    Mail Compose \r\n\r\n    CC, BCC \r\n\r\nTyping Test \r\n\r\n   Speed Increase\r\n\r\n   Typing Method\r\n\r\nAccounts\r\n\r\n   Journal\r\n\r\n   Ledger\r\n\r\nTally Prime\r\n\r\n   Company Creation\r\n\r\n   Ledger Entry\r\n\r\n   Contra, payment, receipt, journal (transactions)\r\n\r\n   Cost center\r\n\r\n   Cost Category\r\n\r\n   Maintain Godown\r\n\r\n   Purchase & Sale\r\n\r\n   GST & Double GST\r\n\r\n   Price Level\r\n\r\n   BOM\r\n\r\n   TDS\r\n\r\n   Budget\r\n\r\n   Job Costing\r\n\r\n   Payroll\r\n\r\nBanking tally\r\n\r\n   Audit Feature\r\n\r\n   BRS\r\n\r\n   Import & Export\r\n\r\n   POS\r\n\r\n   Purchase Order &   Sales Order\r\n\r\n   Purchase Return & Sales Return\r\n\r\n   Interest Calculation.\r\n\r\n   E-Way Bill\r\n\r\n   Tax Invoice, Logo",
+    "exams": [
+      2,
+      3,
+      4,
+      6,
+      7
+    ]
+  }
+},
+{
+  "model": "website_portal.websitecourse",
+  "pk": 7,
+  "fields": {
+    "code": "DGTP",
+    "name": "Digital Graphics & Publication Technology",
+    "order": 5,
+    "course_image": "",
+    "duration": 6,
+    "admission_fee": "1000.00",
+    "monthly_fee": "450.00",
+    "show_on_homepage": false,
+    "syllabus": "Photoshop 7, Cc, Cs\r\n Cutting \r\n Background \r\n Passport\r\n Black & White Photo\r\n Visiting Card\r\n Face Manu pulsation\r\nCoral Draw",
+    "exams": [
+      5
+    ]
+  }
+},
+{
+  "model": "website_portal.websitecourse",
+  "pk": 8,
+  "fields": {
+    "code": "AWDDP",
+    "name": "Advance Web Design & Development Program",
+    "order": 6,
+    "course_image": "",
+    "duration": 12,
+    "admission_fee": "1000.00",
+    "monthly_fee": "450.00",
+    "show_on_homepage": false,
+    "syllabus": "HTML\r\nCSS\r\nJavaScript\r\nPython\r\nGoogle Sites",
+    "exams": [
+      5
+    ]
+  }
+},
+{
+  "model": "website_portal.websitecourse",
+  "pk": 9,
+  "fields": {
+    "code": "CSNA",
+    "name": "Computer System & Network Administration",
+    "order": 7,
+    "course_image": "",
+    "duration": 12,
+    "admission_fee": "1000.00",
+    "monthly_fee": "450.00",
+    "show_on_homepage": false,
+    "syllabus": "Operating System Technologies:\r\n Introduction To Computers\r\n Introduction To Operating System\r\n Types of Software & Languages\r\nIntroducing OS Booting Sequence:\r\n Internal & External Commands\r\n Configuration of Display & Sound Cards\r\n Assembling a computer\r\n Assembling & Installation\r\n Card Identification\r\n PC Support\r\n Installation of Windows7, 8, 10...\r\n Resistor, Capacitor, Inductors\r\n Diodes & Inductors\r\n Comparison Between AC & Dc\r\n Rectifiers and voltage Regulators\r\nDigital electronics:\r\n Number System & Conversion\r\n Basic Logic Gates (NOT, AND, Or)\r\n Universal Gates (NAND, NOR)\r\n Flips Flop\r\n Multiplexer and De-multiplexer\r\n Introduction to Integrated Circuits\r\nAbout Processers:\r\n What is nm\r\n Differentiate Core I3, Core I5 and Core I7 Processor\r\n Multiprocessor configuration\r\nMemory:\r\n Memory management\r\n Format and Unlist\r\n Different Memory types\r\n Discussion on Cache Memory generic\r\nNetworking\r\n Installing, Upgrading, and Migrating to Windows\r\n Deploying Windows 7\r\n Capture a system image\r\n Configure a VHD\r\n Configuring Hardware and Applications\r\n Configure application restrictions\r\n Configure IPv4 network settings\r\n Configure IPv6 network settings\r\n Configure Windows Firewall\r\n Configure remote management\r\n Configure user account control\r\n Configure file and folder access\r\n Configure BitLocker and BitLocker to Go\r\nNetworking Essential\r\n Basics of Networking\r\n ISO/OSI Model\r\n Network Media and Topology\r\n Connecting Networks\r\n Network Protocols (IP, IPX, Net BUI)\r\n Introduction to TCP/IP\r\n Troubleshooting system startup and user logons\r\n The Windows 7 Boot Process\r\n Introduction to different browsers\r\n Input/output devices\r\n Plug and play devices\r\n Configuring and troubleshooting printing\r\n TCP/IP networking\r\n Office installation and configuration\r\n MS Office templates and add-ins\r\n MS Office configuration (Excel, Word, Power Point, Access)",
+    "exams": [
+      8
+    ]
+  }
+}
+]
