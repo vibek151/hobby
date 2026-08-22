@@ -1957,48 +1957,167 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
     # AJAX: GET MONTHLY FEE
     # ----------------------------
 
+    # def get_monthly_fee(self, request):
+
+    #     from datetime import datetime
+    #     from django.utils import timezone
+    #     from student_portal.fee_engine import calculate_student_dues
+
+    #     enrollment_id = request.GET.get("enrollment_id")
+
+    #     try:
+
+    #         enrollment = CourseEnrollment.objects.get(
+    #             id=enrollment_id
+    #         )
+
+    #         payment_date = request.GET.get(
+    #             "payment_date"
+    #         )
+
+    #         if payment_date:
+
+    #             today = datetime.strptime(
+    #                 payment_date,
+    #                 "%Y-%m-%d"
+    #             ).date()
+
+    #         else:
+
+    #             today = timezone.now().date()
+
+    #         data = calculate_student_dues(
+    #             enrollment,
+    #             today
+    #         )
+
+    #         return JsonResponse({
+
+    #             "monthly_fee": float(
+    #                 data["amount"]
+    #             ),
+
+    #             "fine": float(
+    #                 data["fine"]
+    #             ),
+
+    #             "due_date":
+    #             data["due_date"].strftime(
+    #                 "%Y-%m-%d"
+    #             ),
+
+    #             "pending_months":
+    #             data["pending_months"]
+
+    #         })
+
+    #     except CourseEnrollment.DoesNotExist:
+
+    #         return JsonResponse(
+    #             {"error":"Not found"},
+    #             status=404
+    #         )
     def get_monthly_fee(self, request):
 
         from datetime import datetime
         from django.utils import timezone
+        from django.db.models import Sum
         from student_portal.fee_engine import calculate_student_dues
 
         enrollment_id = request.GET.get("enrollment_id")
 
         try:
-
             enrollment = CourseEnrollment.objects.get(
                 id=enrollment_id
             )
 
-            payment_date = request.GET.get(
-                "payment_date"
-            )
+            # ==========================================
+            # PAYMENT DATE
+            # ==========================================
+
+            payment_date = request.GET.get("payment_date")
 
             if payment_date:
-
-                today = datetime.strptime(
+                calc_date = datetime.strptime(
                     payment_date,
                     "%Y-%m-%d"
                 ).date()
-
             else:
+                calc_date = timezone.now().date()
 
-                today = timezone.now().date()
+            # ==========================================
+            # FEE ENGINE
+            # ==========================================
 
             data = calculate_student_dues(
                 enrollment,
-                today
+                calc_date
             )
 
-            return JsonResponse({
+            engine_amount = data["amount"] or 0
 
+            # ==========================================
+            # ACTUAL COURSE FEE ALREADY PAID
+            #
+            # Admission is NOT counted here.
+            # Monthly + Advance reduce course fee.
+            # ==========================================
+
+            paid_total = (
+                Fee.objects
+                .filter(
+                    enrollment=enrollment,
+                    fee_type__in=[
+                        "MONTHLY",
+                        "ADVANCE",
+                    ]
+                )
+                .aggregate(
+                    total=Sum("amount")
+                )["total"] or 0
+            )
+
+            # ==========================================
+            # ACTUAL REMAINING COURSE FEE
+            # ==========================================
+
+            remaining_course_fee = max(
+                0,
+                (enrollment.total_fee or 0) - paid_total
+            )
+
+            # ==========================================
+            # FINAL AMOUNT
+            #
+            # Never allow the generated monthly amount
+            # to exceed the actual remaining course fee.
+            # ==========================================
+
+            monthly_amount = min(
+                engine_amount,
+                remaining_course_fee
+            )
+
+            # ==========================================
+            # DEBUG
+            # ==========================================
+
+            print("========== GET MONTHLY FEE ==========")
+            print("Enrollment:", enrollment.id)
+            print("Course Total:", enrollment.total_fee)
+            print("Paid Total:", paid_total)
+            print("Remaining Course Fee:", remaining_course_fee)
+            print("Engine Amount:", engine_amount)
+            print("FINAL AMOUNT:", monthly_amount)
+            print("=====================================")
+
+            return JsonResponse({
                 "monthly_fee": float(
-                    data["amount"]
+                    monthly_amount
                 ),
 
                 "fine": float(
-                    data["fine"]
+                    data["fine"] or 0
                 ),
 
                 "due_date":
@@ -2008,16 +2127,14 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
 
                 "pending_months":
                 data["pending_months"]
-
             })
 
         except CourseEnrollment.DoesNotExist:
 
             return JsonResponse(
-                {"error":"Not found"},
+                {"error": "Not found"},
                 status=404
             )
-        
     
     # ----------------------------
     # AUTO SELECT ENROLLMENT
@@ -2117,46 +2234,47 @@ class CertificateAdmin(FranchiseAdmin, SimpleHistoryAdmin):
         )
     resend_button.short_description = "Resend Email"
     from django.urls import path
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
+    # def get_queryset(self, request):
+    #     qs = super().get_queryset(request)
 
-        for cert in qs:
+    #     for cert in qs:
 
-            enrollment = CourseEnrollment.objects.filter(
-                student=cert.student,
-                course=cert.completed_course,
-                is_active=True
-            ).first()
+    #         enrollment = CourseEnrollment.objects.filter(
+    #             student=cert.student,
+    #             course=cert.completed_course,
+    #             is_active=True
+    #         ).first()
 
-            if not enrollment:
-                continue
+    #         if not enrollment:
+    #             continue
 
-            total_paid = (
-                Fee.objects.filter(
-                    enrollment=enrollment,
-                    fee_type="MONTHLY"
-                ).aggregate(total=Sum("amount"))["total"] or 0
-            )
+    #         total_paid = (
+    #             Fee.objects.filter(
+    #                 enrollment=enrollment,
+    #                 fee_type="MONTHLY"
+    #             ).aggregate(total=Sum("amount"))["total"] or 0
+    #         )
 
-            remaining_fee = enrollment.total_fee - total_paid
+    #         remaining_fee = enrollment.total_fee - total_paid
 
-            latest_fee = Fee.objects.filter(
-                enrollment=enrollment
-            ).order_by("-id").first()
+    #         latest_fee = Fee.objects.filter(
+    #             enrollment=enrollment
+    #         ).order_by("-id").first()
 
-            remaining_fine = latest_fee.remaining_fine if latest_fee else 0
+    #         remaining_fine = latest_fee.remaining_fine if latest_fee else 0
 
-            new_status = (
-                remaining_fee == 0
-                and remaining_fine == 0
-                and cert.check_exam_completion()
-            )
+    #         new_status = (
+    #             remaining_fee == 0
+    #             and remaining_fine == 0
+    #             and cert.check_exam_completion()
+    #         )
 
-            if cert.is_published != new_status:
-                cert.is_published = new_status
-                cert.save(update_fields=["is_published"])
+    #         if cert.is_published != new_status:
+    #             cert.is_published = new_status
+    #             cert.save(update_fields=["is_published"])
 
-        return qs
+    #     return qs
+
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -2173,78 +2291,34 @@ class CertificateAdmin(FranchiseAdmin, SimpleHistoryAdmin):
 
         obj = Certificate.objects.get(pk=pk)
 
-        enrollment = CourseEnrollment.objects.filter(
-            student=obj.student,
-            course=obj.completed_course
-        ).first()
-
-        if enrollment:
-
-            total_paid = (
-                Fee.objects.filter(
-                    enrollment=enrollment,
-                    fee_type="MONTHLY"
-                ).aggregate(
-                    total=Sum("amount")
-                )["total"] or 0
+        if not obj.is_published:
+            messages.error(
+                request,
+                "Certificate is not published. Email cannot be resent."
+            )
+            return redirect(
+                request.META.get("HTTP_REFERER")
             )
 
-            total_fine_paid = (
-                Fee.objects.filter(
-                    enrollment=enrollment
-                ).aggregate(
-                    total=Sum("fine")
-                )["total"] or 0
+        try:
+            send_certificate_email(
+                obj,
+                force=True
             )
 
-            remaining_fee = (
-                enrollment.total_fee - total_paid
+            messages.success(
+                request,
+                "✅ Certificate email sent again successfully."
             )
 
-            latest_fee = Fee.objects.filter(
-                enrollment=enrollment
-            ).order_by("-id").first()
-
-            remaining_fine = 0
-
-            if latest_fee:
-                remaining_fine = (
-                    latest_fee.remaining_fine or 0
-                )
-
-            if (
-                remaining_fee > 0
-                or remaining_fine > 0
-            ):
-
-                messages.error(
-
-                    request,
-
-                    f"Student still has pending dues. Remaining Fee: ₹{remaining_fee}, Remaining Fine: ₹{remaining_fine}"
-
-                )
-
-                return redirect(
-                    request.META.get(
-                        "HTTP_REFERER"
-                    )
-                )
-
-        send_certificate_email(
-            obj,
-            force=True
-        )
-
-        messages.success(
-            request,
-            "✅ Email sent again successfully."
-        )
+        except Exception as e:
+            messages.error(
+                request,
+                f"❌ Failed to send certificate email: {e}"
+            )
 
         return redirect(
-            request.META.get(
-                "HTTP_REFERER"
-            )
+            request.META.get("HTTP_REFERER")
         )
 
     from student_portal.utils.certificate_email import send_certificate_email
@@ -2260,41 +2334,68 @@ class CertificateAdmin(FranchiseAdmin, SimpleHistoryAdmin):
         ).first()
 
         if not enrollment:
+
             obj.is_published = False
             obj.published_at = None
             student.course_completed = False
-            messages.error(request, "No active enrollment found.")
+
+            messages.error(
+                request,
+                "No active enrollment found."
+            )
 
         else:
 
+            # -----------------------------
+            # CHECK REMAINING FEE
+            # -----------------------------
             total_paid = (
                 Fee.objects
                 .filter(
                     enrollment=enrollment,
-                    fee_type="MONTHLY"
+                    fee_type__in=["MONTHLY", "ADVANCE"]
                 )
                 .aggregate(
                     total=Sum("amount")
-                )["total"]
-                or 0
+                )["total"] or 0
             )
 
-            remaining_fee = (
-                enrollment.total_fee
-                - total_paid
+            remaining_fee = max(
+                (enrollment.total_fee or 0) - total_paid,
+                0
             )
 
-            latest_fee = Fee.objects.filter(
-                enrollment=enrollment
-            ).order_by("-id").first()
+            # -----------------------------
+            # CHECK REMAINING FINE
+            # -----------------------------
+            latest_fee = (
+                Fee.objects
+                .filter(enrollment=enrollment)
+                .order_by("-id")
+                .first()
+            )
 
-            remaining_fine = 0
+            remaining_fine = (
+                latest_fee.remaining_fine or 0
+                if latest_fee
+                else 0
+            )
 
-            if latest_fee:
-                remaining_fine = (
-                    latest_fee.remaining_fine or 0
-                )
+            # -----------------------------
+            # CHECK EXAM
+            # -----------------------------
             exams_completed = obj.check_exam_completion()
+
+            # -----------------------------
+            # FINAL ELIGIBILITY
+            # -----------------------------
+            print("========== CERTIFICATE DEBUG ==========")
+            print("Total Fee:", enrollment.total_fee)
+            
+            print("Remaining Fee:", remaining_fee)
+            print("Remaining Fine:", remaining_fine)
+            print("Exams Completed:", exams_completed)
+            print("=======================================")
             if (
                 remaining_fee > 0
                 or remaining_fine > 0
@@ -2303,21 +2404,15 @@ class CertificateAdmin(FranchiseAdmin, SimpleHistoryAdmin):
 
                 obj.is_published = False
                 obj.published_at = None
-
                 student.course_completed = False
 
                 messages.warning(
-
                     request,
-
-                    f"""Certificate uploaded but NOT published.
-
-                Remaining Fee: ₹{remaining_fee}
-
-                Remaining Fine: ₹{remaining_fine}
-
-                
-                """
+                    f"Certificate uploaded but NOT published. "
+                    f"Remaining Fee: ₹{remaining_fee:.2f}, "
+                    f"Remaining Fine: ₹{remaining_fine:.2f}, "
+                    f"Exams Completed: "
+                    f"{'Yes' if exams_completed else 'No'}"
                 )
 
             else:
@@ -2334,28 +2429,33 @@ class CertificateAdmin(FranchiseAdmin, SimpleHistoryAdmin):
                     "Certificate published successfully."
                 )
 
-                student.save(update_fields=["course_completed"])
+            student.save(
+                update_fields=["course_completed"]
+            )
 
-        # ✅ SAVE FIRST (IMPORTANT)
-        print("BEFORE SAVE:", obj.is_published)
+        # -----------------------------
+        # SAVE CERTIFICATE
+        # -----------------------------
+        print("BEFORE SUPER SAVE:", obj.is_published)
+        super().save_model(
+            request,
+            obj,
+            form,
+            change
+        )
 
-        super().save_model(request, obj, form, change)
+        print("CERTIFICATE PUBLISHED:", obj.is_published)
 
-        print("AFTER SAVE:", obj.is_published)
-
-        # 🔥 ADD THIS BLOCK (THIS IS THE FIX)
-        # if obj.is_published and not obj.email_sent:
-        #     try:
-        #         send_certificate_email(obj)
-        #     except Exception as e:
-        #         print("❌ Email failed:", e)
-
-        # from core.utils.email_tasks import send_certificate_email_async
-
+        # -----------------------------
+        # SEND EMAIL ONLY IF PUBLISHED
+        # -----------------------------
         if obj.is_published and not obj.email_sent:
-            db_alias = obj._state.db  # 🔥 IMPORTANT
+
             transaction.on_commit(
-                lambda: send_certificate_email_async(obj.id, obj.franchise)
+                lambda: send_certificate_email_async(
+                    obj.id,
+                    obj.franchise
+                )
             )
 
     def get_fields(self, request, obj=None):

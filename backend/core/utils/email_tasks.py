@@ -22,6 +22,11 @@ def send_certificate_email_async(instance_id, franchise):
             print(f"📨 Sending email for ID {instance_id}")
             send_certificate_email(cert)
 
+            # Mark email as sent only after successful sending
+            cert.email_sent = True
+            cert.save(update_fields=["email_sent"])
+            print(f"✅ email_sent=True saved for Certificate ID: {instance_id}")
+
         except Certificate.DoesNotExist:
             print(f"❌ Certificate not found in DB: {instance_id}")
 

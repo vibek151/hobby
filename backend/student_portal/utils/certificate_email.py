@@ -4,7 +4,12 @@ import os
 
 def send_certificate_email(instance, force=False):
     instance.refresh_from_db()
-    
+    if not instance.is_published:
+        print(
+            f"⛔ Certificate {instance.id} is not published. "
+            f"Email sending cancelled."
+        )
+        return
     # if instance.email_sent and not force:
     #     print(f"⛔ Certificate {instance.id} already sent, skipping.")
     #     return
@@ -85,18 +90,38 @@ def send_certificate_email(instance, force=False):
     msg.attach_alternative(html_content, "text/html")
 
     # 📄 Attach Certificate
-    if instance.certificate_file and os.path.exists(instance.certificate_file.path):
+    if instance.certificate_file:
+        print("📄 Certificate file:", instance.certificate_file.name)
+
         try:
-            with open(instance.certificate_file.path, "rb") as f:
-                msg.attach("Certificate.pdf", f.read(), "application/pdf")
+            with instance.certificate_file.open("rb") as f:
+                file_data = f.read()
+
+                print("📦 Certificate size:", len(file_data), "bytes")
+
+                msg.attach(
+                    "Certificate.pdf",
+                    file_data,
+                    "application/pdf"
+                )
+
+                print("✅ Certificate attached")
+
         except Exception as e:
             print(f"❌ Certificate attachment error: {e}")
 
+    else:
+        print("❌ NO CERTIFICATE FILE FOUND")
+
     # 📄 Attach Marksheet
-    if instance.marksheet_file and os.path.exists(instance.marksheet_file.path):
+    if instance.marksheet_file:
         try:
-            with open(instance.marksheet_file.path, "rb") as f:
-                msg.attach("Marksheet.pdf", f.read(), "application/pdf")
+            with instance.marksheet_file.open("rb") as f:
+                msg.attach(
+                    "Marksheet.pdf",
+                    f.read(),
+                    "application/pdf"
+                )
         except Exception as e:
             print(f"❌ Marksheet attachment error: {e}")
 

@@ -14,6 +14,7 @@ import calendar
 from core.middleware import get_current_franchise
 # from management_portal.models import Exam, StudentMarks
 from django.apps import apps
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 # ================= COURSE =================
 
 # Add this line below to fix the NameError:
@@ -1123,6 +1124,11 @@ def validate_file_size(value):
         raise ValidationError(f"File too large. Size should not exceed 2MB.")
     return value
 
+def validate_pdf_file(value):
+    if not value.name.lower().endswith(".pdf"):
+        raise ValidationError("Only PDF files are allowed.")
+
+
 class Certificate(MultiTenantModel):
     student = models.ForeignKey(
         StudentAdmission,
@@ -1147,17 +1153,19 @@ class Certificate(MultiTenantModel):
     # 2. Apply the validator directly here
     certificate_file = models.FileField(
         upload_to="certificates/",
-        validators=[validate_file_size]
+        storage=RawMediaCloudinaryStorage(),
+        validators=[validate_file_size, validate_pdf_file]
     )
     
     marksheet_no = models.CharField(max_length=50, blank=True, null=True)
     
     # 3. Apply the validator here as well
     marksheet_file = models.FileField(
-        upload_to="marksheets/", 
-        blank=True, 
-        null=True,
-        validators=[validate_file_size]
+        upload_to="marksheets/",
+        storage=RawMediaCloudinaryStorage(),
+        validators=[validate_file_size, validate_pdf_file],
+        blank=True,
+        null=True
     )
     
     upload_date = models.DateTimeField(auto_now_add=True)
@@ -1331,13 +1339,13 @@ class IssuedCertificate(models.Model):
         # Certificate: Always required, always validated
         certificate_file = models.FileField(
             upload_to='certificates/', 
-            validators=[validate_file_size]
+            validators=[validate_file_size, validate_pdf_file]
         )
         
         # Marksheet: Optional, but IF present, it MUST be less than 2MB
         marksheet_file = models.FileField(
             upload_to='marksheets/', 
-            validators=[validate_file_size], 
+            validators=[validate_file_size, validate_pdf_file], 
             null=True, 
             blank=True
         )

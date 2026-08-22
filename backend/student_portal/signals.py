@@ -12,7 +12,7 @@ from email.mime.image import MIMEImage
 from core.utils.email_tasks import send_certificate_email_async
 import os
 import requests
-
+from django.utils import timezone
 # -------------------------------
 # COURSE COMPLETION LOGIC
 # -------------------------------
@@ -50,7 +50,8 @@ def update_completion(student):
     # TOTAL PAID
     total_paid = (
         Fee.objects
-        .filter(enrollment=enrollment, fee_type="MONTHLY")
+        .filter(enrollment=enrollment)
+        .exclude(fee_type="ADMISSION")
         .aggregate(total=Sum("amount"))["total"]
         or 0
     )
@@ -96,28 +97,51 @@ def cert_deleted(sender, instance, **kwargs):
 # -------------------------------
 # CERTIFICATE PUBLISH LOGIC
 # -------------------------------
-
 @receiver(post_save, sender=Fee)
 @receiver(post_delete, sender=Fee)
 def update_certificate_status(sender, instance, created=False, **kwargs):
-    # print("🔥 SIGNAL TRIGGERED")
 
     enrollment = instance.enrollment
 
-    # ✅ FIXED HERE
-    # if created:
-    #     student = enrollment.student
-    #     if student.email:
-    #         send_fee_email(student, instance)
+    # ==========================================
+    # TOTAL COURSE FEE PAID
+    # ==========================================
 
     total_paid = (
         Fee.objects
-        .filter(enrollment=enrollment, fee_type="MONTHLY")
+        .filter(
+            enrollment=enrollment,
+            fee_type__in=["MONTHLY", "ADVANCE"]
+        )
         .aggregate(total=Sum("amount"))["total"]
         or 0
     )
 
-    remaining = (enrollment.total_fee or 0) - total_paid
+    remaining_fee = max(
+        (enrollment.total_fee or 0) - total_paid,
+        0
+    )
+
+    # ==========================================
+    # REMAINING FINE
+    # ==========================================
+
+    latest_fee = (
+        Fee.objects
+        .filter(enrollment=enrollment)
+        .order_by("-id")
+        .first()
+    )
+
+    remaining_fine = (
+        latest_fee.remaining_fine or 0
+        if latest_fee
+        else 0
+    )
+
+    # ==========================================
+    # CERTIFICATES
+    # ==========================================
 
     certificates = Certificate.objects.filter(
         student=enrollment.student,
@@ -125,27 +149,54 @@ def update_certificate_status(sender, instance, created=False, **kwargs):
     )
 
     for cert in certificates:
-        print("------------------------------------------------")
+
+        exams_completed = cert.check_exam_completion()
+
+        print("--------------------------------")
         print("Certificate:", cert.id)
         print("Before:", cert.is_published)
-        print("Remaining:", remaining)
-        print("Exam Result:", cert.check_exam_completion())
+        print("Total Course Fee:", enrollment.total_fee)
+        print("Total Paid:", total_paid)
+        print("Remaining Fee:", remaining_fee)
+        print("Remaining Fine:", remaining_fine)
+        print("Exam Result:", exams_completed)
+
+        # ==========================================
+        # FINAL PUBLISH CONDITION
+        # ==========================================
+
         new_status = (
-            remaining == 0
-            and cert.check_exam_completion()
+            remaining_fee <= 0
+            and remaining_fine <= 0
+            and exams_completed
         )
+
+        # ==========================================
+        # UPDATE ONLY IF STATUS CHANGED
+        # ==========================================
 
         if cert.is_published != new_status:
 
             cert.is_published = new_status
 
+            if new_status:
+                if not cert.published_at:
+                    cert.published_at = timezone.now()
+            else:
+                cert.published_at = None
+
             cert.save(
-                update_fields=["is_published"]
+                update_fields=[
+                    "is_published",
+                    "published_at"
+                ]
             )
+
+    # ==========================================
+    # UPDATE STUDENT COMPLETION
+    # ==========================================
+
     update_completion(enrollment.student)
-
-
-
 
 @receiver(post_save, sender=CourseEnrollment)
 def enrollment_created(sender, instance, created, **kwargs):

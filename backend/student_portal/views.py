@@ -517,23 +517,40 @@ def calculate_fee(request):
         print("CALCULATOR RETURN")
         print(data)
         print("=" * 50)
+
+        from django.db.models import Sum
+        from decimal import Decimal
+
+        paid_total = (
+            Fee.objects
+            .filter(
+                enrollment=enrollment,
+                fee_type__in=["MONTHLY", "ADVANCE"]
+            )
+            .aggregate(total=Sum("amount"))["total"]
+            or Decimal("0")
+        )
+
+        remaining_course_fee = max(
+            (enrollment.total_fee or Decimal("0")) - paid_total,
+            Decimal("0")
+        )
+
+        final_amount = min(
+            data["amount"],
+            remaining_course_fee
+        )
+
         
         return JsonResponse({
 
-            "monthly_fee":
-                float(data["amount"]),
-
-            "amount":
-                float(data["amount"]),
+            "monthly_fee": float(final_amount),
+            "amount": float(final_amount),
 
             "fine":
                 float(data["fine"]),
 
-            "total":
-                float(
-                    data["amount"]
-                    + data["fine"]
-                ),
+            "total": float(final_amount + data["fine"]),
 
             "due_date":
                 data[
