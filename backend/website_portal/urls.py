@@ -46,4 +46,9 @@ urlpatterns = [
         views.gallery_images,
         name="gallery_images"
     ),
+    path(
+        "sitemap.xml",
+        views.website_sitemap,
+        name="website_sitemap"
+    ),
 ]

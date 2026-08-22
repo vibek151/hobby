@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCourses } from "../../services/courseService";
-
+import { Helmet } from "react-helmet-async";
 import "./CoursesPage.css";
 
 function CoursesPage() {
@@ -27,6 +27,45 @@ function CoursesPage() {
     }, []);
 
     return (
+        <>
+        <Helmet>
+            <title>Computer Courses in Siliguri | SMART COMPUTER INSTITUTE</title>
+
+            <meta
+                name="description"
+                content="Explore professional computer courses at SMART COMPUTER INSTITUTE in Siliguri. Learn Office Applications, Advanced Excel, Tally, Accounting, Python, Web Development and more."
+            />
+
+            <meta
+                name="keywords"
+                content="computer courses in Siliguri, computer institute in Siliguri, computer training Siliguri, Tally course Siliguri, Python course Siliguri, Excel course Siliguri"
+            />
+
+            <link
+                rel="canonical"
+                href="https://smartci.in/courses"
+            />
+
+            <meta
+                property="og:title"
+                content="Computer Courses in Siliguri | SMART COMPUTER INSTITUTE"
+            />
+
+            <meta
+                property="og:description"
+                content="Explore professional computer courses and practical training programs at SMART COMPUTER INSTITUTE."
+            />
+
+            <meta
+                property="og:type"
+                content="website"
+            />
+
+            <meta
+                property="og:url"
+                content="https://smartci.in/courses"
+            />
+        </Helmet>
         <section className="courses-page">
             <div className="courses-header">
                 <span className="subtitle-badge">Our Programs</span>
@@ -86,6 +125,7 @@ function CoursesPage() {
                 </div>
             )}
         </section>
+    </>
     );
 }
 

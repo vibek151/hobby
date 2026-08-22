@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { getCourseDetail } from "../../services/courseService";
 import LeadForm from "../../components/LeadForm/LeadForm";
 import "./CourseDetailPage.css";
@@ -15,10 +16,7 @@ function CourseDetailPage() {
             try {
                 setIsLoading(true);
                 const response = await getCourseDetail(code);
-
                 console.log(response.data);
-
-                setCourse(response.data);
                 setCourse(response.data);
                 setError(null);
             } catch (err) {
@@ -48,6 +46,82 @@ function CourseDetailPage() {
             </div>
         );
     }
+    <Helmet>
+        <title>
+            {course.name} Course in Siliguri | SMART COMPUTER INSTITUTE
+        </title>
+
+        <meta
+            name="description"
+            content={`${course.name} course in Siliguri at SMART COMPUTER INSTITUTE. Learn practical computer skills with structured training, course curriculum, fees and admission information.`}
+        />
+
+        <link
+            rel="canonical"
+            href={`https://smartci.in/courses/${encodeURIComponent(course.code)}`}
+        />
+
+        <meta
+            property="og:title"
+            content={`${course.name} Course in Siliguri | SMART COMPUTER INSTITUTE`}
+        />
+
+        <meta
+            property="og:description"
+            content={`Learn ${course.name} at SMART COMPUTER INSTITUTE, Siliguri. View curriculum, duration, fees and admission information.`}
+        />
+
+        <meta
+            property="og:type"
+            content="website"
+        />
+
+        <meta
+            property="og:url"
+            content={`https://smartci.in/courses/${encodeURIComponent(course.code)}`}
+        />
+
+        <script type="application/ld+json">
+            {JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Course",
+
+                "name": course.name,
+
+                "description":
+                    `${course.name} course in Siliguri at SMART COMPUTER INSTITUTE. ` +
+                    `Learn practical computer skills through structured professional training.`,
+
+                "courseCode": course.code,
+
+                "url": `https://smartci.in/courses/${encodeURIComponent(course.code)}`,
+
+                "inLanguage": "en-IN",
+
+                "educationalLevel": "Professional",
+
+                "provider": {
+                    "@type": "EducationalOrganization",
+                    "name": "SMART COMPUTER INSTITUTE",
+                    "url": "https://smartci.in/",
+                    "address": {
+                        "@type": "PostalAddress",
+                        "addressLocality": "Siliguri",
+                        "addressRegion": "West Bengal",
+                        "addressCountry": "IN"
+                    }
+                },
+
+                "offers": {
+                    "@type": "Offer",
+                    "price": String(course.monthly_fee),
+                    "priceCurrency": "INR",
+                    "url": `https://smartci.in/courses/${encodeURIComponent(course.code)}`,
+                    "availability": "https://schema.org/InStock"
+                }
+            })}
+        </script>
+    </Helmet>
 
     // Dynamic Syllabus Module Parsing
     const syllabusLines = course.syllabus ? course.syllabus.split("\n") : [];

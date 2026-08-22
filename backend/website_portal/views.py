@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .models import WebsiteCourse
 from .models import WebsiteStat
 from .models import WebsiteContact
@@ -215,4 +215,39 @@ def gallery_images(request):
     return JsonResponse(
         data,
         safe=False
+    )
+
+def website_sitemap(request):
+    courses = WebsiteCourse.objects.all().order_by("order")
+
+    urls = [
+        "https://smartci.in/",
+        "https://smartci.in/courses",
+        "https://smartci.in/verify",
+    ]
+
+    # Add every dynamic course page
+    for course in courses:
+        urls.append(
+            f"https://smartci.in/courses/{course.code}"
+        )
+
+    xml_urls = ""
+
+    for url in urls:
+        xml_urls += f"""
+    <url>
+        <loc>{url}</loc>
+    </url>
+"""
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{xml_urls}
+</urlset>
+"""
+
+    return HttpResponse(
+        xml,
+        content_type="application/xml"
     )
