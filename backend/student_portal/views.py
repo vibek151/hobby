@@ -752,12 +752,25 @@ def send_otp(request):
         ]
     }
 
-    result = mailjet.send.create(data=data)
+    try:
+        result = mailjet.send.create(data=data)
 
-    if result.status_code not in [200, 201]:
+        print("MAILJET STATUS:", result.status_code)
+        print("MAILJET RESPONSE:", result.json())
+
+        if result.status_code not in [200, 201]:
+            return JsonResponse({
+                "success": False,
+                "message": "Mailjet rejected the email",
+                "mailjet_response": result.json()
+            }, status=500)
+
+    except Exception as e:
+        print("MAILJET ERROR:", str(e))
+
         return JsonResponse({
             "success": False,
-            "message": "Unable to send OTP email"
+            "message": "Mailjet connection failed"
         }, status=500)
 
 
