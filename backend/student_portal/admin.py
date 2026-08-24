@@ -49,6 +49,7 @@ from .models import (
     Fee,
     Certificate,
 )
+from django.shortcuts import redirect
 from io import BytesIO
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
@@ -66,6 +67,10 @@ admin.site.unregister(Group)
 from .models import BatchDay
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.lib.utils import ImageReader
+from .signals import send_fee_email_async
+
+
+
 def draw_wrapped_text(p, text, x, y, max_width, line_height=14):
     words = text.split()
     line = ""
@@ -1457,7 +1462,7 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
         url = reverse("admin:student_portal_fee_add") + f"?student={obj.id}"
         return format_html('<a class="button" href="{}">Add Payment</a>', url)
     
-    from django.contrib import messages
+    
 
     def delete_queryset(self, request, queryset):
 
@@ -1531,7 +1536,6 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
         )
 
     resend_mail_button.short_description = "Mail"
-    from django.contrib import messages
     from django.contrib.admin import action
 
     @action(description="Delete selected student admissions")
@@ -1669,11 +1673,55 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
         "fee_type_display",
         "total_amount",
         "waive_fine",
+        "resend_receipt",
         "last_modified_by",
     )
     
     actions = ["safe_delete"]
+    def resend_receipt_view(self, request, pk):
+        obj = Fee.objects.get(pk=pk)
 
+        student = obj.enrollment.student
+
+        if not student.email:
+            messages.error(
+                request,
+                f"{student.name} does not have an email address."
+            )
+            return redirect(request.META.get("HTTP_REFERER", "../"))
+
+        send_fee_email_async(student, obj)
+
+        messages.success(
+            request,
+            f"Receipt #{obj.receipt_no} sent again to {student.email}."
+        )
+
+        return redirect(request.META.get("HTTP_REFERER", "../"))
+
+    def resend_receipt(self, obj):
+        if not obj.enrollment or not obj.enrollment.student.email:
+            return format_html(
+                '<span style="color:#999;">No Email</span>'
+            )
+
+        # url = reverse(
+        #     "admin:student_portal_fee_resend_receipt",
+        #     args=[obj.pk]
+        # )
+
+        url = reverse(
+            "admin:student_portal_fee_resend_receipt",
+            args=[obj.pk]
+        )        
+
+
+        return format_html(
+            '<a class="button" href="{}">Resend</a>',
+            url
+        )
+
+    resend_receipt.short_description = "Receipt"
 
 
     def last_modified_by(self, obj):
@@ -1705,13 +1753,20 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
     # ----------------------------
     def get_urls(self):
         urls = super().get_urls()
+
         custom_urls = [
+            path(
+                "resend-receipt/<int:pk>/",
+                self.admin_site.admin_view(self.resend_receipt_view),
+                name="student_portal_fee_resend_receipt",
+            ),
             path(
                 "get-monthly-fee/",
                 self.admin_site.admin_view(self.get_monthly_fee),
                 name="get_monthly_fee",
             ),
         ]
+
         return custom_urls + urls
 
     def get_actions(self, request):
@@ -2187,7 +2242,7 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
 
 from django.utils.html import format_html
 from django.urls import path
-from django.shortcuts import redirect
+
 
 from .utils.certificate_email import send_certificate_email
 
@@ -3101,7 +3156,7 @@ class BatchListAdmin(FranchiseAdmin):
     
 from django.contrib import admin
 from django.urls import path
-from django.shortcuts import redirect
+
 
 class CustomAdminSite(admin.AdminSite):
     site_header = "Admin Panel"
