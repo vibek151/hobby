@@ -1,6 +1,6 @@
 import os
 import requests
-
+from django.conf import settings
 from django.template.loader import render_to_string
 
 
@@ -19,7 +19,7 @@ def send_student_email(
 
     message = {
         "From": {
-            "Email": "settings.DEFAULT_FROM_EMAIL",
+            "Email": settings.DEFAULT_FROM_EMAIL,
             "Name": "Smart Computer Institute"
         },
         "To": [

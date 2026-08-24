@@ -44,7 +44,7 @@ import threading
 import os
 import base64
 import requests
-
+from django.conf import settings
 
 def send_email_async(
     subject,
@@ -73,7 +73,7 @@ def send_email_async(
 
             message_data = {
                 "From": {
-                    "Email": "settings.DEFAULT_FROM_EMAIL",
+                    "Email": settings.DEFAULT_FROM_EMAIL,
                     "Name": "Smart Computer Institute"
                 },
                 "To": [
