@@ -38,7 +38,7 @@ function Courses() {
                             <div className="course-image-container">
                                 <img
                                     className="course-image"
-                                    src={`${import.meta.env.VITE_API_URL}${course.course_image}`}
+                                    src={course.course_image}
                                     alt={course.name}
                                 />
                                 <div className="image-overlay-shade"></div>
