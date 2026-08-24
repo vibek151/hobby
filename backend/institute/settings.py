@@ -242,3 +242,5 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.smartci.in",
 ]
 
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
