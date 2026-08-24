@@ -219,7 +219,7 @@ EMAIL_USE_SSL = False
 EMAIL_HOST_USER = os.environ.get("MAILJET_API_KEY")
 EMAIL_HOST_PASSWORD = os.environ.get("MAILJET_SECRET_KEY")
 
-DEFAULT_FROM_EMAIL = "Smart Computer Institute (No Reply) <noreply@smartci.in>"
+DEFAULT_FROM_EMAIL = "noreply@smartci.in"
 
 EMAIL_TIMEOUT = 30
 
