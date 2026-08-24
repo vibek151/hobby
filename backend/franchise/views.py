@@ -13,7 +13,7 @@ import os
 from .models import Franchise
 from .utils import generate_temp_code, generate_otp
 from django.core.cache import cache
-
+from django.conf import settings
 
 
 
@@ -35,7 +35,7 @@ def send_email_otp(request):
                 "Messages": [
                     {
                         "From": {
-                            "Email": "smartcomputerins2022@gmail.com",
+                            "Email": settings.DEFAULT_FROM_EMAIL,
                             "Name": "Smart Computer Institute",
                         },
                         "To": [
