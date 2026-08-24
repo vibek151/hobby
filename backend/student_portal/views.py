@@ -16,6 +16,8 @@ from student_portal.models import Fee
 from .models import Certificate
 from django.urls import reverse
 from django.core.mail import EmailMultiAlternatives
+from mailjet_rest import Client
+import os
 from student_portal.models import (
     BatchDay,
     BatchTiming,
@@ -722,15 +724,41 @@ def send_otp(request):
     </html>
     """
 
-    msg = EmailMultiAlternatives(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [student.email],
+    mailjet = Client(
+        auth=(
+            os.environ.get("MAILJET_API_KEY"),
+            os.environ.get("MAILJET_SECRET_KEY")
+        ),
+        version="v3.1"
     )
 
-    msg.attach_alternative(html_message, "text/html")
-    msg.send(fail_silently=False)
+    data = {
+        "Messages": [
+            {
+                "From": {
+                    "Email": os.environ.get("DEFAULT_FROM_EMAIL"),
+                    "Name": "Smart Computer Institute"
+                },
+                "To": [
+                    {
+                        "Email": student.email,
+                        "Name": student.name
+                    }
+                ],
+                "Subject": subject,
+                "TextPart": message,
+                "HTMLPart": html_message
+            }
+        ]
+    }
+
+    result = mailjet.send.create(data=data)
+
+    if result.status_code not in [200, 201]:
+        return JsonResponse({
+            "success": False,
+            "message": "Unable to send OTP email"
+        }, status=500)
 
 
     return JsonResponse({
