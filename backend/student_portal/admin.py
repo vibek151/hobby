@@ -1699,6 +1699,12 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
     )
     readonly_fields = ("fee_type",)
     autocomplete_fields = ["enrollment"]
+
+    search_fields = (
+        "enrollment__student__student_id",
+        "enrollment__student__name",
+    )
+
     list_display = (
         "get_student",
         "enrollment",
