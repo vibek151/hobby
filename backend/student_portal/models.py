@@ -467,13 +467,20 @@ class StudentAdmission(MultiTenantModel):
             # =========================
             # COURSE ADVANCE PAYMENT
             # =========================
+
+            advance_fee = Fee.objects.filter(
+                enrollment=enrollment,
+                fee_type="ADVANCE",
+            ).first()
+
             if self.advance_fees and self.advance_fees > 0:
 
+                # Create new advance fee OR update existing one
                 Fee.objects.update_or_create(
-                    receipt_no=self.receipt_no,
-                    fee_type="ADVANCE",
                     enrollment=enrollment,
+                    fee_type="ADVANCE",
                     defaults={
+                        "receipt_no": self.receipt_no,
                         "amount": self.advance_fees,
                         "pay_via": self.admission_pay_via or "CASH",
                         "payment_date": self.admission_date or timezone.now().date(),
@@ -487,6 +494,15 @@ class StudentAdmission(MultiTenantModel):
                         "generated_total": self.advance_fees,
                     }
                 )
+
+            else:
+
+                # If advance fee was removed/changed to 0,
+                # remove the old ADVANCE payment from Fee page
+                Fee.objects.filter(
+                    enrollment=enrollment,
+                    fee_type="ADVANCE",
+                ).delete()
 
 
     def get_form(self, request, obj=None, **kwargs):
