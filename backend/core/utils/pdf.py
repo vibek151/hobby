@@ -196,20 +196,37 @@ def generate_admission_pdf(student):
         y -= 18
 
     # PAYMENT DETAILS
+
     y -= 10
+
     p.setFont("Helvetica-Bold", 13)
     p.drawString(40, y, "PAYMENT DETAILS")
     y -= 20
 
     p.setFont("Helvetica", 11)
 
+    advance_payment = getattr(student, 'advance_fees', 0) or 0
+    admission_amount = getattr(student, 'admission_amount', 0) or 0
+    discount_percent = getattr(student, 'discount_percent', 0) or 0
+
+    discount_amount = admission_amount * discount_percent / 100
+    final_amount = admission_amount - discount_amount
+
     p_info = [
         f"Receipt No : {getattr(student, 'receipt_no', '-')}",
-        f"Admission Fee : Rs. {getattr(student, 'admission_amount', '-')}",
-        f"Discount (%) : {getattr(student, 'discount_percent', '-')}",
-        f"Final Amount : Rs. {getattr(student, 'final_amount', '-')}",
-        f"Monthly Fee : Rs. {getattr(student, 'monthly_fee', '-')}"
+        f"Admission Fee : Rs. {admission_amount:.2f}",
+        f"Discount (%) : {discount_percent}",
     ]
+
+    if advance_payment > 0:
+        p_info.append(f"Advance Payment : Rs. {advance_payment:.2f}")
+        p_info.append(f"Final Amount : Rs. {final_amount + advance_payment:.2f}")
+    else:
+        p_info.append(f"Final Amount : Rs. {final_amount:.2f}")
+
+    p_info.append(
+        f"Monthly Fee : Rs. {getattr(student, 'monthly_fee', 0):.2f}"
+    )
 
     for line in p_info:
         p.drawString(50, y, line)
