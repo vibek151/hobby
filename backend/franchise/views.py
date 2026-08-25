@@ -157,7 +157,7 @@ def forgot_password(request):
             json={
                 "Messages": [{
                     "From": {
-                        "Email": "smartcomputerins2022@gmail.com",
+                        "Email": settings.DEFAULT_FROM_EMAIL,
                         "Name": "Smart Computer Institute"
                     },
                     "To": [
@@ -428,7 +428,7 @@ def send_account_change_otp(request):
             "Messages": [
                 {
                     "From": {
-                        "Email": "smartcomputerins2022@gmail.com",
+                        "Email": settings.DEFAULT_FROM_EMAIL,
                         "Name": "Smart Computer Institute",
                     },
                     "To": [
