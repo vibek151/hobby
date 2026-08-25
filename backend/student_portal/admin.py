@@ -2289,6 +2289,10 @@ from .utils.certificate_email import send_certificate_email
 
 @admin.register(Certificate)
 class CertificateAdmin(FranchiseAdmin, SimpleHistoryAdmin):
+    search_fields = (
+        "enrollment__student__student_id",
+        "enrollment__student__name",
+    )
     list_display = (
         "student",
         "completed_course",
