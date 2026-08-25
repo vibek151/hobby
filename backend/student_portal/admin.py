@@ -607,21 +607,26 @@ class StudentAdmissionForm(FranchiseRequiredForm):
     def clean_last_qualification_file(self):
         file = self.cleaned_data.get("last_qualification_file")
 
-        if file:
-            ext = file.name.split(".")[-1].lower()
-            if ext not in ["jpg", "jpeg", "png", "pdf"]:
+        # Validate only when a NEW file is uploaded
+        if file and hasattr(file, "name"):
+            ext = file.name.rsplit(".", 1)[-1].lower()
+
+            if "." in file.name and ext not in ["jpg", "jpeg", "png", "pdf"]:
                 raise ValidationError(
                     "Only JPG, PNG or PDF allowed."
                 )
 
         return file
 
+
     def clean_document_file(self):
         file = self.cleaned_data.get("document_file")
 
-        if file:
-            ext = file.name.split(".")[-1].lower()
-            if ext not in ["jpg", "jpeg", "png", "pdf"]:
+        # Validate only when a NEW file is uploaded
+        if file and hasattr(file, "name"):
+            ext = file.name.rsplit(".", 1)[-1].lower()
+
+            if "." in file.name and ext not in ["jpg", "jpeg", "png", "pdf"]:
                 raise ValidationError(
                     "Only JPG, PNG or PDF allowed."
                 )
