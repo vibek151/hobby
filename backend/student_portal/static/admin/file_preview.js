@@ -1,117 +1,4 @@
 
-// document.addEventListener("DOMContentLoaded", function () {
-
-//     document.querySelectorAll('input[type="file"]').forEach(function (input) {
-
-//         let btn = document.createElement("button");
-//         btn.type = "button";
-//         btn.innerHTML = "🙈";
-//         btn.className = "preview-eye-btn";
-//         btn.style.marginLeft = "6px";
-
-//         input.after(btn);
-
-//         // ✅ Find SAME FIELD ROW
-//         let row = input.closest(".form-row");
-
-//         let existingLink = null;
-//         if (row){
-//             let links = row.querySelectorAll("a[href]");
-//             links.forEach(l => {
-//                 if (l.textContent.includes("/") || l.href.includes("/media/")){
-//                     existingLink = l;
-//                 }
-//             });
-//         }
-
-//         // If file exists → open eye
-//         if (existingLink){
-//             btn.innerHTML = "👁️";
-//         }
-
-//         // On new file select
-//         input.addEventListener("change", function () {
-//             if (input.files.length > 0){
-//                 btn.innerHTML = "👁️";
-//             } else if (!existingLink){
-//                 btn.innerHTML = "🙈";
-//             }
-//         });
-
-//         // Preview click
-//         btn.onclick = function () {
-
-//             let url = null;
-
-//             // New file selected
-//             if (input.files.length > 0){
-//                 url = URL.createObjectURL(input.files[0]);
-//             }
-//             // Existing file
-//             else{
-//                 let row = input.closest(".form-row");
-//                 let link = row ? row.querySelector("a[href]") : null;
-
-//                 if (link){
-//                     url = link.href;
-//                 }
-//             }
-
-//             if (!url){
-//                 alert("No file available");
-//                 return;
-//             }
-//         let w = screen.width * 0.5;
-//         let h = screen.height * 0.9;
-//         window.open(
-//                 url,
-//                 "_blank",
-//                 `width=${w},height=${h},resizable=yes,scrollbars=yes`
-//             );
-
-//         viewer.document.write(`
-//         <!DOCTYPE html>
-//         <html>
-//         <head>
-//         <title>Preview</title>
-//         <style>
-//         body{
-//             margin:0;
-//             background:black;
-//             display:flex;
-//             justify-content:center;
-//             align-items:center;
-//             height:100vh;
-//         }
-//         img, embed{
-//             max-width:100%;
-//             max-height:100%;
-//         }
-//         </style>
-//         </head>
-//         <body>
-//         ${
-//         url.match(/\.(jpg|jpeg|png|gif|webp)$/i)
-//         ? `<img src="${url}">`
-//         : `<embed src="${url}" type="application/pdf" width="100%" height="100%">`
-//         }
-//         </body>
-//         </html>
-//         `);
-//         viewer.document.close();
-
-
-//                 };
-
-//             });
-
-//         });
-
-
-
-
-
-
 document.addEventListener("DOMContentLoaded", function () {
 
     // ============================================================
@@ -318,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function openCropEditor(input, file, previewButton) {
 
-        const imageURL =
+        let imageURL =
             URL.createObjectURL(file);
 
 
@@ -401,10 +288,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         </select>
 
+                    <div class="smart-rotate-buttons">
+
+                        <button
+                            type="button"
+                            class="smart-rotate-btn"
+                            data-rotation="-90"
+                            title="Rotate left"
+                        >
+                            ↶ Rotate Left
+                        </button>
+
+                        <button
+                            type="button"
+                            class="smart-rotate-btn"
+                            data-rotation="90"
+                            title="Rotate right"
+                        >
+                            ↷ Rotate Right
+                        </button>
+
                     </div>
 
+                </div>
 
-                    <!-- RENAME -->
+
+                <!-- RENAME -->
 
                     <div class="smart-control-row">
 
@@ -475,6 +384,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const targetUnit =
             overlay.querySelector(
                 ".smart-target-unit"
+            );
+
+        const rotateButtons =
+            overlay.querySelectorAll(
+                ".smart-rotate-btn"
             );
 
         const nameInput =
@@ -850,6 +764,223 @@ document.addEventListener("DOMContentLoaded", function () {
 
             }
         );
+
+
+
+        // ========================================================
+        // ROTATE IMAGE
+        // ========================================================
+
+        async function rotateImage(degrees) {
+
+            if (
+                !img.naturalWidth ||
+                !img.naturalHeight
+            ) {
+                return;
+            }
+
+
+            rotateButtons.forEach(function (button) {
+                button.disabled = true;
+            });
+
+
+            try {
+
+                const sourceWidth =
+                    img.naturalWidth;
+
+                const sourceHeight =
+                    img.naturalHeight;
+
+
+                const canvas =
+                    document.createElement("canvas");
+
+
+                // 90 degree rotation swaps width and height
+                canvas.width =
+                    sourceHeight;
+
+                canvas.height =
+                    sourceWidth;
+
+
+                const ctx =
+                    canvas.getContext("2d");
+
+
+                ctx.imageSmoothingEnabled =
+                    true;
+
+                ctx.imageSmoothingQuality =
+                    "high";
+
+
+                // Move to canvas center
+                ctx.translate(
+                    canvas.width / 2,
+                    canvas.height / 2
+                );
+
+
+                // Rotate
+                ctx.rotate(
+                    degrees *
+                    Math.PI /
+                    180
+                );
+
+
+                // Draw image
+                ctx.drawImage(
+                    img,
+                    -sourceWidth / 2,
+                    -sourceHeight / 2,
+                    sourceWidth,
+                    sourceHeight
+                );
+
+
+                // Create rotated image
+                const rotatedBlob =
+                    await new Promise(function (resolve) {
+
+                        canvas.toBlob(
+                            function (blob) {
+                                resolve(blob);
+                            },
+                            "image/png"
+                        );
+
+                    });
+
+
+                if (!rotatedBlob) {
+
+                    throw new Error(
+                        "Could not rotate image."
+                    );
+
+                }
+
+
+                const newURL =
+                    URL.createObjectURL(
+                        rotatedBlob
+                    );
+
+
+                const oldURL =
+                    imageURL;
+
+
+                // Wait until rotated image loads
+                await new Promise(function (resolve, reject) {
+
+                    const handleLoad =
+                        function () {
+
+                            resolve();
+
+                        };
+
+
+                    const handleError =
+                        function () {
+
+                            reject(
+                                new Error(
+                                    "Could not load rotated image."
+                                )
+                            );
+
+                        };
+
+
+                    img.addEventListener(
+                        "load",
+                        handleLoad,
+                        {
+                            once: true
+                        }
+                    );
+
+
+                    img.addEventListener(
+                        "error",
+                        handleError,
+                        {
+                            once: true
+                        }
+                    );
+
+
+                    img.src =
+                        newURL;
+
+                });
+
+
+                // Store the new image URL
+                imageURL =
+                    newURL;
+
+
+                // Remove old object URL
+                URL.revokeObjectURL(
+                    oldURL
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Rotation error:",
+                    error
+                );
+
+                alert(
+                    "Could not rotate the image."
+                );
+
+            } finally {
+
+                rotateButtons.forEach(function (button) {
+                    button.disabled = false;
+                });
+
+            }
+
+        }
+
+
+        // ========================================================
+        // ROTATE BUTTONS
+        // ========================================================
+
+        rotateButtons.forEach(function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const degrees =
+                        parseInt(
+                            button.dataset.rotation,
+                            10
+                        );
+
+
+                    rotateImage(
+                        degrees
+                    );
+
+                }
+            );
+
+        });
 
 
         // ========================================================
