@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <input
                             type="number"
                             class="smart-target-size"
-                            value="200"
+                            value="50"
                             min="10"
                             max="10000"
                         >
@@ -1024,7 +1024,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 value <= 0
             ) {
 
-                value = 200;
+                value = 50;
 
             }
 
