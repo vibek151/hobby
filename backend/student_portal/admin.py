@@ -1721,7 +1721,11 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
         "last_modified_by",
     )
     
-    actions = ["safe_delete"]
+    actions = [
+        "safe_delete",
+        "delete_duplicate_admission",
+    ]
+
     def resend_receipt_view(self, request, pk):
         obj = Fee.objects.get(pk=pk)
 
@@ -1965,6 +1969,35 @@ class FeeAdmin(FranchiseAdmin, SimpleHistoryAdmin):
             f"Successfully deleted {queryset.count()} fee(s).",
             level=messages.SUCCESS
         )
+
+    @admin.action(description="Delete selected duplicate admission fee")
+    def delete_duplicate_admission(self, request, queryset):
+
+        for obj in queryset:
+
+            if obj.fee_type != "ADMISSION":
+                self.message_user(
+                    request,
+                    f"Fee ID {obj.id} is not an Admission fee. Skipped.",
+                    level=messages.WARNING
+                )
+                continue
+
+            fee_id = obj.id
+            receipt_no = obj.receipt_no
+            amount = obj.amount
+            student_name = obj.enrollment.student.name
+
+            obj.delete(bypass_lock=True)
+
+            self.message_user(
+                request,
+                f"Deleted Fee ID {fee_id} | "
+                f"Student: {student_name} | "
+                f"Receipt: {receipt_no} | "
+                f"Amount: ₹{amount}",
+                level=messages.SUCCESS
+            )
 
     # ----------------------------
     # DELETE BUTTON CONTROL
