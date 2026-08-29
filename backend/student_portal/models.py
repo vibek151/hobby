@@ -435,11 +435,11 @@ class StudentAdmission(MultiTenantModel):
 
             admission_fee = Fee.objects.filter(
                 enrollment=enrollment,
-                receipt_no=self.receipt_no,
                 fee_type="ADMISSION",
             ).first()
 
             if admission_fee:
+                admission_fee.receipt_no = self.receipt_no
                 admission_fee.amount = discounted_admission
                 admission_fee.generated_fee = discounted_admission
                 admission_fee.pay_via = self.admission_pay_via or "CASH"
