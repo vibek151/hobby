@@ -1055,7 +1055,10 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
             StudentAdmission._base_manager
             .filter(
                 class_time_id=class_time_id,
-                class_day__id=batch_day_id
+                class_day__id=batch_day_id,
+                is_active=True,
+                is_freezed=False,
+                course_completed=False
             )
             .distinct()
             .count()
@@ -2344,31 +2347,24 @@ class CertificateAdmin(FranchiseAdmin, SimpleHistoryAdmin):
     #             course=cert.completed_course,
     #             is_active=True
     #         ).first()
-
     #         if not enrollment:
     #             continue
-
     #         total_paid = (
     #             Fee.objects.filter(
     #                 enrollment=enrollment,
     #                 fee_type="MONTHLY"
     #             ).aggregate(total=Sum("amount"))["total"] or 0
     #         )
-
     #         remaining_fee = enrollment.total_fee - total_paid
-
     #         latest_fee = Fee.objects.filter(
     #             enrollment=enrollment
     #         ).order_by("-id").first()
-
     #         remaining_fine = latest_fee.remaining_fine if latest_fee else 0
-
     #         new_status = (
     #             remaining_fee == 0
     #             and remaining_fine == 0
     #             and cert.check_exam_completion()
     #         )
-
     #         if cert.is_published != new_status:
     #             cert.is_published = new_status
     #             cert.save(update_fields=["is_published"])
