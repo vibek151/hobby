@@ -90,19 +90,7 @@ SCI
                 text-align:center;
                 background:#fffaf7;
             ">
-                # <img
-                #     src="https://smartci.in/static/birthday_animation.gif"
-                #     alt="Happy Birthday"
-                #     width="560"
-                #     style="
-                #         display:block;
-                #         width:100%;
-                #         max-width:560px;
-                #         height:auto;
-                #         margin:0 auto;
-                #         border:0;
-                #     "
-                # >
+                
             </div>
 
 
