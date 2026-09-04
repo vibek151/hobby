@@ -13,6 +13,18 @@ function LeadForm({ course, onClose }) {
 
     const [loading, setLoading] = useState(false);
 
+    const showToast = (message, type = "error") => {
+        const toast = document.createElement("div");
+        toast.className = `auth-toast ${type}`;
+        toast.textContent = message;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    };
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -34,7 +46,7 @@ function LeadForm({ course, onClose }) {
 
             await createLead(payload);
 
-            alert("Application submitted successfully!");
+            showToast("Application submitted successfully!", "success");
 
             setFormData({
                 name: "",
@@ -47,7 +59,7 @@ function LeadForm({ course, onClose }) {
             onClose();
         } catch (err) {
             console.error(err);
-            alert("Unable to submit application.");
+            showToast("Unable to submit application.", "error");
         } finally {
             setLoading(false);
         }

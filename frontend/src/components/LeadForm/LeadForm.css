@@ -102,6 +102,42 @@
     cursor: not-allowed;
 }
 
+
+.auth-toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background: #fff;
+    color: #222;
+    padding: 14px 18px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+    font-size: 14px;
+    z-index: 9999;
+    animation: toastIn 0.3s ease;
+}
+
+.auth-toast.error {
+    border-left: 4px solid #e53935;
+}
+
+.auth-toast.success {
+    border-left: 4px solid #43a047;
+}
+
+@keyframes toastIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+
 @keyframes popup {
     from {
         transform: translateY(20px) scale(.96);

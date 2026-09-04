@@ -12,28 +12,56 @@ function StudentLogin() {
     const [resendTimer, setResendTimer] = useState(0);
     const [sendingOTP, setSendingOTP] = useState(false);
     const [otp, setOtp] = useState("");
+
+    const showToast = (message) => {
+        const toast = document.createElement("div");
+        toast.className = "auth-toast";
+        toast.textContent = message;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 5000);
+    };
+
+
     async function handleSubmit(e) {
         e.preventDefault();
 
         setSendingOTP(true);
 
-        try {
+        let finalLoginValue = loginValue;
 
+        if (loginMode === "student") {
+            const parts = loginValue.trim().split("/");
+
+            if (parts.length === 3 && /^\d+$/.test(parts[2])) {
+                parts[0] = parts[0].toUpperCase();
+                parts[1] = parts[1].toUpperCase();
+                parts[2] = parts[2].padStart(4, "0");
+
+                finalLoginValue = parts.join("/");
+            }
+        }
+
+        try {
             const response = await sendOTP({
                 mode: loginMode,
-                value: loginValue,
+                value: finalLoginValue,
                 dob: dob
             });
 
             if (response.data.success) {
                 setOtpSent(true);
                 startResendTimer();
+            } else {
+                showToast("Invalid Login Credentials");
             }
 
         } catch (error) {
-
             console.error(error);
-
+            showToast("Unable to connect to server.");
         }
 
         setSendingOTP(false);
@@ -218,7 +246,7 @@ function StudentLogin() {
                 onChange={(e) => setLoginValue(e.target.value)}
                 // Your custom twisted placeholders applied seamlessly below:
                 placeholder={
-                    loginMode === "email" ? "name@smartCi.com" : "MG/SLG/000"
+                    loginMode === "email" ? "name@smartCi.com" : "MG/SLG/0000"
                 }
                 style={{
                     width: "100%",
@@ -393,3 +421,34 @@ function StudentLogin() {
     }
 
 export default StudentLogin;
+const style = document.createElement("style");
+style.innerHTML = `
+.auth-toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background: #fff;
+    color: #222;
+    padding: 14px 20px;
+    border-radius: 10px;
+    border-left: 4px solid #e53935;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    animation: toastIn 0.3s ease;
+}
+
+@keyframes toastIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+`;
+
+document.head.appendChild(style);
