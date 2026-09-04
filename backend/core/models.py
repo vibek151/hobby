@@ -1,31 +1,4 @@
-# from django.db import models
-# from core.middleware import get_current_franchise
 
-# class TenantManager(models.Manager):
-#     def get_queryset(self):
-#         # The Magic: This automatically filters every query by the logged-in franchise
-#         franchise = get_current_franchise()
-#         if franchise:
-#             return super().get_queryset().filter(franchise=franchise)
-#         return super().get_queryset()
-
-# class MultiTenantModel(models.Model):
-#     # Every student, fee, and course will have this hidden link
-#     franchise = models.ForeignKey('franchise.Franchise', on_delete=models.CASCADE)
-    
-#     objects = TenantManager() # Use our custom filter
-#     original_objects = models.Manager() # For when you need to see everything (Superuser)
-
-#     class Meta:
-#         abstract = True
-
-#     def save(self, *args, **kwargs):
-#         # Automatically assign the franchise when saving if not already set
-#         if not self.franchise_id:
-#             self.franchise = get_current_franchise()
-#         super().save(*args, **kwargs)
-
-# management_portal/models.py
 
 from django.db import models
 from core.middleware import get_current_franchise, get_current_user

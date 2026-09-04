@@ -12,6 +12,7 @@ from email.mime.image import MIMEImage
 from core.utils.email_tasks import send_certificate_email_async
 import os
 import requests
+from .models import Fee
 from django.utils import timezone
 # -------------------------------
 # COURSE COMPLETION LOGIC
@@ -273,7 +274,7 @@ def send_fee_email(student, instance):
 
     display_fine = 0 if is_waived else late_fine
     display_total = (instance.amount or 0) + display_fine
-
+    
     html_content = f"""
     <html>
     <body style="font-family: Arial; background-color:#f5f5f5; padding:20px;">
@@ -382,8 +383,6 @@ def send_fee_email_async(student, instance):
     threading.Thread(target=send).start()
     
 
-
-from .models import Fee
 
 
 

@@ -609,11 +609,27 @@ def send_otp(request):
         ).first()
 
     else:
+        raw_student_id = str(login_value or "").strip()
+        parts = raw_student_id.split("/")
 
-        student = StudentAdmission._base_manager.filter(
-            student_id=login_value,
-            dob=dob
-        ).first()
+        student = None
+
+        if (
+            len(parts) == 3
+            and parts[0].strip()
+            and parts[1].strip()
+            and parts[2].strip().isdigit()
+        ):
+            prefix = parts[0].strip().upper()
+            branch = parts[1].strip().upper()
+            number = parts[2].strip()
+
+            normalized_student_id = f"{prefix}/{branch}/{number}"
+
+            student = StudentAdmission.original_objects.filter(
+                student_id=normalized_student_id,
+                dob=dob
+            ).first()
 
    
     if not student:

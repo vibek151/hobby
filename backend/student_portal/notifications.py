@@ -1,4 +1,5 @@
 import os
+import logging
 import requests
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -44,17 +45,26 @@ def send_student_email(
 
         message["Attachments"] = attachments
 
-    response = requests.post(
-        "https://api.mailjet.com/v3.1/send",
-        auth=(
-            os.environ["MAILJET_API_KEY"],
-            os.environ["MAILJET_SECRET_KEY"]
-        ),
-        json={
-            "Messages": [message]
-        }
-    )
+    try:
+        response = requests.post(
+            "https://api.mailjet.com/v3.1/send",
+            auth=(
+                os.environ["MAILJET_API_KEY"],
+                os.environ["MAILJET_SECRET_KEY"]
+            ),
+            json={
+                "Messages": [message]
+            },
+            timeout=30
+        )
 
-    response.raise_for_status()
+        response.raise_for_status()
+        return response.json()
 
-    return response.json()
+    except Exception as e:
+        logging.exception(
+            "Student email failed for %s: %s",
+            student.email,
+            e
+        )
+        return None
