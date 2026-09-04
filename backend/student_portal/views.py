@@ -23,7 +23,9 @@ from student_portal.models import (
     BatchTiming,
     StudentAdmission,
     Course,
-    Certificate
+    Certificate,
+    CourseEnrollment,
+    CourseUpgrade,
 )
 
 # Set up logging for error tracking
@@ -916,6 +918,70 @@ def get_profile(request):
 
 
 
+# def get_course_history(request):
+
+#     student_id = request.session.get(
+#         "student_id"
+#     )
+
+#     if not student_id:
+
+#         return JsonResponse({
+#             "success": False
+#         })
+
+#     student = StudentAdmission._base_manager.get(
+#         student_id=student_id
+#     )
+
+#     certificate = Certificate._base_manager.filter(
+#         student__student_id=student.student_id,
+#         completed_course=student.course,
+#         is_published=True
+#     ).first()
+#     print("Student =", student)
+#     print("Course =", student.course)
+#     print("Certificate =", certificate)
+
+#     if certificate:
+#         print("End date =", certificate.end_date)
+#     data = [
+
+#         {
+
+#             "code": student.course.code,
+
+#             "name": student.course.name,
+
+#             "duration": student.course.duration,
+
+#             "start_date":
+#                 student.admission_date.strftime("%d-%m-%Y")
+#                 if student.admission_date
+#                 else "-",
+
+#             "end_date":
+#                 certificate.end_date.strftime("%d-%m-%Y")
+#                 if certificate and certificate.end_date
+#                 else None,
+
+#             "status":
+#                 "Completed"
+#                 if student.course_completed
+#                 else "Running"
+
+#         }
+
+#     ]
+
+#     return JsonResponse({
+
+#         "success": True,
+
+#         "courses": data
+
+#     })
+
 def get_course_history(request):
 
     student_id = request.session.get(
@@ -923,7 +989,6 @@ def get_course_history(request):
     )
 
     if not student_id:
-
         return JsonResponse({
             "success": False
         })
@@ -932,45 +997,237 @@ def get_course_history(request):
         student_id=student_id
     )
 
-    certificate = Certificate._base_manager.filter(
-        student__student_id=student.student_id,
-        completed_course=student.course,
-        is_published=True
-    ).first()
-    print("Student =", student)
-    print("Course =", student.course)
-    print("Certificate =", certificate)
+    # --------------------------------------------------
+    # GET ALL UPGRADES FOR THIS STUDENT
+    # --------------------------------------------------
 
-    if certificate:
-        print("End date =", certificate.end_date)
-    data = [
+    upgrades = (
+        CourseUpgrade._base_manager
+        .filter(student=student)
+        .select_related(
+            "old_course",
+            "new_course"
+        )
+        .order_by(
+            "start_date",
+            "id"
+        )
+    )
 
-        {
+    # --------------------------------------------------
+    # BUILD COURSE HISTORY
+    # --------------------------------------------------
 
-            "code": student.course.code,
+    courses = []
 
-            "name": student.course.name,
+    if upgrades.exists():
 
-            "duration": student.course.duration,
+        # First course = old course of first upgrade
+        first_upgrade = upgrades.first()
 
-            "start_date":
-                student.admission_date.strftime("%d-%m-%Y")
-                if student.admission_date
-                else "-",
+        if first_upgrade.old_course:
+            courses.append(
+                first_upgrade.old_course
+            )
 
-            "end_date":
-                certificate.end_date.strftime("%d-%m-%Y")
-                if certificate and certificate.end_date
-                else None,
+        # Then every upgraded course
+        for upgrade in upgrades:
 
-            "status":
-                "Completed"
-                if student.course_completed
-                else "Running"
+            if upgrade.new_course:
+                courses.append(
+                    upgrade.new_course
+                )
 
-        }
+    else:
 
-    ]
+        # No upgrade history
+        if student.course:
+            courses.append(
+                student.course
+            )
+
+    # --------------------------------------------------
+    # REMOVE DUPLICATES
+    # --------------------------------------------------
+
+    unique_courses = []
+    seen = set()
+
+    for course in courses:
+
+        if course and course.id not in seen:
+
+            unique_courses.append(course)
+            seen.add(course.id)
+
+    courses = unique_courses
+
+    # --------------------------------------------------
+    # GET ENROLLMENTS
+    # --------------------------------------------------
+
+    enrollments = (
+        CourseEnrollment._base_manager
+        .filter(student=student)
+        .select_related("course")
+        .order_by(
+            "admission_date",
+            "id"
+        )
+    )
+
+    # --------------------------------------------------
+    # BUILD RESPONSE
+    # --------------------------------------------------
+
+    data = []
+
+    for index, course in enumerate(courses):
+
+        is_current = (
+            student.course
+            and course.id == student.course.id
+        )
+
+        enrollment = (
+            enrollments
+            .filter(course=course)
+            .first()
+        )
+
+        # ----------------------------------------------
+        # COURSE TYPE
+        # ----------------------------------------------
+
+        if is_current:
+
+            course_type = student.course_type
+
+        else:
+
+            course_type = None
+
+        # ----------------------------------------------
+        # DURATION
+        # ----------------------------------------------
+
+        if is_current:
+
+            duration = student.course_duration
+
+        elif enrollment:
+
+            duration = enrollment.duration
+
+        else:
+
+            duration = course.duration
+
+        # ----------------------------------------------
+        # MONTHLY FEE
+        # ----------------------------------------------
+
+        if is_current:
+
+            monthly_fee = student.monthly_fee
+
+        elif enrollment:
+
+            monthly_fee = enrollment.monthly_fee
+
+        else:
+
+            monthly_fee = course.monthly_fee
+
+        # ----------------------------------------------
+        # START DATE
+        # ----------------------------------------------
+
+        if enrollment:
+
+            start_date = enrollment.admission_date
+
+        else:
+
+            start_date = None
+
+        # ----------------------------------------------
+        # CERTIFICATE
+        # ----------------------------------------------
+
+        certificate = (
+            Certificate._base_manager
+            .filter(
+                student=student,
+                completed_course=course
+            )
+            .order_by("-upload_date")
+            .first()
+        )
+
+        # ----------------------------------------------
+        # STATUS
+        # ----------------------------------------------
+
+        status = (
+            "Completed"
+            if is_current and student.course_completed
+            else "Running"
+            if is_current
+            else "Completed"
+        )
+
+        # ----------------------------------------------
+        # END DATE
+        # ----------------------------------------------
+
+        end_date = None
+
+        if certificate and certificate.end_date:
+
+            end_date = certificate.end_date
+
+        # ----------------------------------------------
+        # ADD COURSE
+        # ----------------------------------------------
+
+        data.append({
+
+            "id": course.id,
+
+            "code": course.code,
+
+            "name": course.name,
+
+            "course_type": course_type,
+
+            "duration": duration,
+
+            "monthly_fee": (
+                float(monthly_fee)
+                if monthly_fee is not None
+                else None
+            ),
+
+            "start_date": (
+                start_date.strftime("%d-%m-%Y")
+                if start_date
+                else "-"
+            ),
+
+            "end_date": (
+                end_date.strftime("%d-%m-%Y")
+                if end_date
+                else None
+            ),
+
+            "status": status,
+
+            "upgraded": (
+                index < len(courses) - 1
+            )
+
+        })
 
     return JsonResponse({
 
@@ -979,8 +1236,6 @@ def get_course_history(request):
         "courses": data
 
     })
-
-
 
 
 def get_marks(request):
