@@ -1238,16 +1238,67 @@ def get_course_history(request):
     })
 
 
-def get_marks(request):
+# def get_marks(request):
 
-    student_id = request.session.get(
-        "student_id"
-    )
+#     student_id = request.session.get(
+#         "student_id"
+#     )
+
+#     if not student_id:
+
+#         return JsonResponse({
+#             "success": False
+#         })
+
+#     student = StudentAdmission._base_manager.get(
+#         student_id=student_id
+#     )
+
+#     marks = StudentMarks.objects.filter(
+#         student=student
+#     ).select_related(
+#         "exam"
+#     )
+
+#     data = []
+
+#     for mark in marks:
+
+#         data.append({
+
+#             "exam_name":
+#                 mark.exam.exam_name,
+
+#             "marks":
+#                 mark.marks,
+
+#             "total_marks":
+#                 mark.exam.total_marks,
+
+#             "result":
+#                 "Pass"
+#                 if mark.marks >= 40
+#                 else "Fail"
+
+#         })
+
+#     return JsonResponse({
+
+#         "success": True,
+
+#         "marks": data
+
+#     })
+
+
+
+def get_marks(request):
+    student_id = request.session.get("student_id")
 
     if not student_id:
-
         return JsonResponse({
-            "success": False
+            "success": False,
+            "marks": []
         })
 
     student = StudentAdmission._base_manager.get(
@@ -1257,38 +1308,47 @@ def get_marks(request):
     marks = StudentMarks.objects.filter(
         student=student
     ).select_related(
-        "exam"
+        "exam",
+        "exam__course"
     )
 
     data = []
 
     for mark in marks:
 
+        # Same status logic as Course History
+        is_current = (
+            student.course
+            and mark.exam.course.id == student.course.id
+        )
+
+        course_status = (
+            "Completed"
+            if is_current and student.course_completed
+            else "Running"
+            if is_current
+            else "Completed"
+        )
+
         data.append({
+            "exam_name": mark.exam.exam_name,
+            "marks": mark.marks,
+            "total_marks": mark.exam.total_marks,
+            "result": "Pass" if mark.marks >= 40 else "Fail",
 
-            "exam_name":
-                mark.exam.exam_name,
-
-            "marks":
-                mark.marks,
-
-            "total_marks":
-                mark.exam.total_marks,
-
-            "result":
-                "Pass"
-                if mark.marks >= 40
-                else "Fail"
-
+            "course_id": mark.exam.course.id,
+            "course_code": mark.exam.course.code,
+            "course_name": mark.exam.course.name,
+            "course_status": course_status,
         })
 
     return JsonResponse({
-
         "success": True,
-
         "marks": data
-
     })
+
+
+
 
 
 def get_payments(request):
