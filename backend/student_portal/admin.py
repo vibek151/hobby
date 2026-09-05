@@ -68,7 +68,7 @@ from .models import BatchDay
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.lib.utils import ImageReader
 from .signals import send_fee_email_async
-
+from django.db.models import Prefetch
 
 
 def draw_wrapped_text(p, text, x, y, max_width, line_height=14):
@@ -805,11 +805,22 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
         'course_completed',  # 👈 ADD THIS
     )
 
+    # def last_modified_by(self, obj):
+    #     # This pulls from the simple-history records
+    #     last_history = obj.history.first()
+    #     if last_history and last_history.history_user:
+    #         return f"{last_history.history_user} ({last_history.history_date.strftime('%d-%m %H:%M')})"
+    #     return "Original"
+
     def last_modified_by(self, obj):
-        # This pulls from the simple-history records
-        last_history = obj.history.first()
-        if last_history and last_history.history_user:
-            return f"{last_history.history_user} ({last_history.history_date.strftime('%d-%m %H:%M')})"
+        history = getattr(obj, "list_history", [])
+
+        if history:
+            last_history = history[0]
+
+            if last_history.history_user:
+                return f"{last_history.history_user} ({last_history.history_date.strftime('%d-%m %H:%M')})"
+
         return "Original"
 
     last_modified_by.short_description = "Footprint"
@@ -854,6 +865,33 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
 
     upgrade_button.short_description = "Upgrade"
     search_fields = ("name", "=student_id", "=phone", "=document_number")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        active_enrollments = (
+            CourseEnrollment.objects
+            .filter(is_active=True)
+            .prefetch_related("payments")
+        )
+
+        return (
+            qs
+            .select_related("course")
+            .prefetch_related(
+                Prefetch(
+                    "enrollments",
+                    queryset=active_enrollments,
+                    to_attr="list_enrollments",
+                ),
+                Prefetch(
+                    "history",
+                    to_attr="list_history",
+                ),
+            )
+        )
+
+
     
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -1472,34 +1510,66 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
     
     
 
-    def add_payment_button(self, obj):
+    # def add_payment_button(self, obj):
 
-        # Get active enrollment
-        enrollment = obj.enrollments.filter(is_active=True).first()
+    #     # Get active enrollment
+    #     enrollment = obj.enrollments.filter(is_active=True).first()
+
+    #     if not enrollment:
+    #         return "-"
+
+    #     # Calculate total monthly paid
+    #     total_paid = (
+    #         enrollment.payments
+    #         .filter(fee_type="MONTHLY")
+    #         .aggregate(total=Sum("amount"))["total"]
+    #         or 0
+    #     )
+
+    #     remaining = enrollment.total_fee - total_paid
+
+    #     # If fully paid
+    #     if remaining <= 0:
+    #         return format_html(
+    #             '<span style="color:green; font-weight:bold;">Fully Paid ✓</span>'
+    #         )
+
+    #     # Otherwise show button
+    #     url = reverse("admin:student_portal_fee_add") + f"?student={obj.id}"
+    #     return format_html('<a class="button" href="{}">Add Payment</a>', url)
+    
+    def add_payment_button(self, obj):
+        enrollments = getattr(obj, "list_enrollments", [])
+
+        enrollment = next(
+            (e for e in enrollments if e.is_active),
+            None
+        )
 
         if not enrollment:
             return "-"
 
-        # Calculate total monthly paid
-        total_paid = (
-            enrollment.payments
-            .filter(fee_type="MONTHLY")
-            .aggregate(total=Sum("amount"))["total"]
-            or 0
+        total_paid = sum(
+            (payment.amount or 0)
+            for payment in enrollment.payments.all()
+            if payment.fee_type == "MONTHLY"
         )
 
-        remaining = enrollment.total_fee - total_paid
+        remaining = (enrollment.total_fee or 0) - total_paid
 
-        # If fully paid
         if remaining <= 0:
             return format_html(
                 '<span style="color:green; font-weight:bold;">Fully Paid ✓</span>'
             )
 
-        # Otherwise show button
-        url = reverse("admin:student_portal_fee_add") + f"?student={obj.id}"
-        return format_html('<a class="button" href="{}">Add Payment</a>', url)
-    
+        url = reverse(
+            "admin:student_portal_fee_add"
+        ) + f"?student={obj.id}"
+
+        return format_html(
+            '<a class="button" href="{}">Add Payment</a>',
+            url
+        )
     
 
     def delete_queryset(self, request, queryset):
