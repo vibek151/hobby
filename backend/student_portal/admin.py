@@ -805,23 +805,14 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
         'course_completed',  # 👈 ADD THIS
     )
 
-    # def last_modified_by(self, obj):
-    #     # This pulls from the simple-history records
-    #     last_history = obj.history.first()
-    #     if last_history and last_history.history_user:
-    #         return f"{last_history.history_user} ({last_history.history_date.strftime('%d-%m %H:%M')})"
-    #     return "Original"
-
     def last_modified_by(self, obj):
-        history = getattr(obj, "list_history", [])
-
-        if history:
-            last_history = history[0]
-
-            if last_history.history_user:
-                return f"{last_history.history_user} ({last_history.history_date.strftime('%d-%m %H:%M')})"
-
+        # This pulls from the simple-history records
+        last_history = obj.history.first()
+        if last_history and last_history.history_user:
+            return f"{last_history.history_user} ({last_history.history_date.strftime('%d-%m %H:%M')})"
         return "Original"
+
+   
 
     last_modified_by.short_description = "Footprint"
 
@@ -883,10 +874,6 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
                     "enrollments",
                     queryset=active_enrollments,
                     to_attr="list_enrollments",
-                ),
-                Prefetch(
-                    "history",
-                    to_attr="list_history",
                 ),
             )
         )
