@@ -787,7 +787,7 @@ class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
         'download_pdf',
         'report_button',
         'resend_mail_button',
-        'last_modified_by',  # 👈 Add this for Step 3 transparency
+        # 'last_modified_by',  # 👈 Add this for Step 3 transparency
     )
     
     def course_completed_display(self, obj):
