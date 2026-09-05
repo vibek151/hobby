@@ -699,7 +699,7 @@ class StudentAdmissionForm(FranchiseRequiredForm):
 
 @admin.register(StudentAdmission)
 class StudentAdmissionAdmin(FranchiseAdmin, SimpleHistoryAdmin):
- 
+    list_per_page = 15
     form = StudentAdmissionForm
     readonly_fields = () 
     def get_readonly_fields(self, request, obj=None):
